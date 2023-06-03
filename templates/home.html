@@ -1,0 +1,130 @@
+<!DOCTYPE html>
+<html>
+
+<head>
+
+    <title>Ming Letters</title>
+    <script src="https://cdn.staticfile.org/jquery/3.5.1/jquery.min.js"></script>
+    <script src="https://cdn.staticfile.org/echarts/5.1.2/echarts.min.js"></script>
+    <style>
+        .line {
+            display: flex;
+            flex-direction: row;
+            height: 600px;
+        }
+
+        .left-container {
+            display: flex;
+            width: 33.33%;
+            flex-direction: column;
+        }
+
+        #plot {
+            flex: 1;
+            height: 100%;
+        }
+
+        .left {
+            padding: 50px;
+        }
+
+        #right-container {
+            display: flex;
+            flex-direction: row;
+            width: 66.67%;
+            border: 10px solid #ccc;
+            padding: 50px;
+        }
+
+    </style>
+</head>
+
+<body>
+    <center>
+        <h1>明代书信社交网络——中国历代人物传记数据库(CBDB)数据可视化</h1>
+    </center>
+    <div class="line">
+        <div class="left-container">
+            <div class="left">
+                <div>这里是筛选</div>
+            </div>
+            <div class="left">
+                <div>这里是搜索</div>
+            </div>
+            <div class="left">
+                <div>这里是数据统计</div>
+            </div>
+        </div>
+        <div id="right-container" class="right">
+            <div id="plot"></div>
+        </div>
+    </div>
+
+    <script>
+        var data = {{ data | tojson }};
+
+        // 提取需要的字段
+        var authors = data.map(d => d['作者']);
+        var authorBirthYears = data.map(d => d['作者生年']);
+        var authorDeathYears = data.map(d => d['作者卒年']);
+        var titles = data.map(d => d['作品标题']);
+        var correspondenceRelationships = data.map(d => d['通讯关系']);
+        var correspondents = data.map(d => d['通讯人']);
+        var correspondentBirthYears = data.map(d => d['通讯人生年']);
+        var correspondentDeathYears = data.map(d => d['通讯人卒年']);
+        var correspondenceCounts = data.map(d => d['通讯次数']);
+        var correspondenceYears = data.map(d => d['通讯年份']);
+        var era = data.map(d => d['年号']);
+        var year = data.map(d => d['年']);
+        var anthology = data.map(d => d['文集']);
+        var source = data.map(d => d['出处']);
+        var volume = data.map(d => d['卷']);
+        var cssSequenceNumber = data.map(d => d['CSS序号']);
+        var cssNumber = data.map(d => d['CSS编号']);
+        var remarks = data.map(d => d['备注']);
+
+        var communicationRelations = data.map(d => [d['通讯关系'], d['作者'], d['通讯人']]);
+
+        // 初始化 echarts 实例
+        var myChart = echarts.init(document.getElementById('plot'));
+
+        myChart.showLoading();
+
+        // 构造节点数据
+        var nodes = authors.slice(0, 100).map(function (node, index) {
+            return {
+                id: index,
+                name: node,
+                symbolSize: 10, // 节点的大小
+                // category: node.category // 节点所属的分类，可用于颜色区分
+            };
+        });
+
+        // 构造边数据
+        var links = communicationRelations.slice(0, 500).map(function (link) {
+            return {
+                source: '0',
+                target: '1'
+            };
+        });
+
+        console.log('node', nodes)
+        console.log('link', links)
+
+        let option = {
+            tooltip: {},
+            series: [{
+                name: 'Communication Network',
+                type: 'graph',
+                layout: 'force',
+                data: nodes,
+                links: links
+            }]
+        };
+
+        myChart.setOption(option);
+        myChart.hideLoading();
+    </script>
+</body>
+
+</html>
