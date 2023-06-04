@@ -1,0 +1,28 @@
+.line {
+  display: flex;
+  flex-direction: row;
+  height: 600px;
+}
+
+.left-container {
+  display: flex;
+  width: 33.33%;
+  flex-direction: column;
+}
+
+#plot {
+  flex: 1;
+  height: 100%;
+}
+
+.left {
+  padding: 50px;
+}
+
+#right-container {
+  display: flex;
+  flex-direction: row;
+  width: 66.67%;
+  border: 10px solid #ccc;
+  padding: 50px;
+}
