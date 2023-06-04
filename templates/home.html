@@ -35,7 +35,6 @@
             border: 10px solid #ccc;
             padding: 50px;
         }
-
     </style>
 </head>
 
@@ -90,25 +89,41 @@
 
         myChart.showLoading();
 
-        // 构造节点数据
-        var nodes = authors.slice(0, 100).map(function (node, index) {
-            return {
-                id: index,
-                name: node,
-                symbolSize: 10, // 节点的大小
-                // category: node.category // 节点所属的分类，可用于颜色区分
-            };
+        // 数据预处理
+        var uniqueNodesSet = new Set();
+        var uniqueNodes = {};
+
+        data.forEach(function (item) {
+            uniqueNodesSet.add(item.作者);
+            uniqueNodesSet.add(item.通讯人);
         });
 
-        // 构造边数据
-        var links = communicationRelations.slice(0, 500).map(function (link) {
+        var uniqueNodesArray = Array.from(uniqueNodesSet);
+        uniqueNodesArray.forEach(function (node, index) {
+            uniqueNodes[node] = index + 1;
+        });
+
+        console.log(uniqueNodes)
+
+        // 构造节点数据
+        var nodes = Object.keys(uniqueNodes).map(function (key) {
             return {
-                source: '0',
-                target: '1'
+                id: uniqueNodes[key],
+                name: key,
+                symbolSize: 10, // 节点的大小
             };
         });
 
         console.log('node', nodes)
+
+        // 构造边数据
+        var links = communicationRelations.slice(0,500).map(function (rela) {
+            return {
+                source: uniqueNodes[rela[1]] + '',
+                target: uniqueNodes[rela[2]] + ''
+            };
+        });
+
         console.log('link', links)
 
         let option = {
