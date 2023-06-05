@@ -60,19 +60,74 @@ var links = communicationRelations.slice(0, 500).map(function (rela) {
   };
 });
 
+var edges = communicationRelations.map(function (rela) {
+  return {
+    source: uniqueNodes[rela[1]] + '',
+    target: uniqueNodes[rela[2]] + '',
+    value: 10
+  };
+});
+
 console.log('link', links)
 
 let option = {
   tooltip: {},
+  emphasis: { // 高亮样式
+    focus: 'series', // 设置高亮类型为系列
+    itemStyle: {
+      borderWidth: 1, // 边框宽度
+      borderColor: 'yellow', // 边框颜色
+      shadowBlur: 10, // 阴影模糊度
+      shadowColor: 'yellow' // 阴影颜色
+    }
+  },
+  // grid: {  // 创建一个虚拟的坐标轴
+  //   show: true,
+  //   left: '10%',
+  //   right: '10%',
+  //   top: '10%',
+  //   bottom: '10%',
+  // },
+  // dataZoom: [{  // 应用dataZoom到虚拟的坐标轴
+  //   type: 'slider',
+  //   xAxisIndex: [0],
+  //   // yAxisIndex: [0],
+  // }],
+  xAxis: {
+    type: 'value'
+  },
+  yAxis: {
+    type: 'value',
+  },
   series: [{
     name: 'Communication Network',
     roam: true,
     type: 'graph',
     layout: 'force',
-    data: nodes,
-    links: links
-  }]
+    nodes: nodes,
+    edges: edges,
+    // coordinateSystem: 'cartesian2d',
+    // xAxisIndex: 0, // 对第一个x轴进行缩放
+    // yAxisIndex: 0 // 对第一个y轴进行缩放
+  }],
+  // dataZoom: {
+  //   type: 'inside', // 内置型数据区域缩放组件
+  //   xAxisIndex: 0, // 对第一个x轴进行缩放
+  //   yAxisIndex: 0, // 对第一个y轴进行缩放
+  // },
+  focusNodeAdjacency: true
 };
 
 myChart.setOption(option);
 myChart.hideLoading();
+
+// myChart.dispatchAction({
+//   type: 'highlight',
+//   name: '申时行', // 数据点的名称
+//   itemStyle: {
+//       borderWidth: 3,
+//       borderColor: 'yellow',
+//       shadowBlur: 10,
+//       shadowColor: 'yellow'
+//     }
+// });
