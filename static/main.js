@@ -66,6 +66,7 @@ let option = {
   tooltip: {},
   series: [{
     name: 'Communication Network',
+    roam: true,
     type: 'graph',
     layout: 'force',
     data: nodes,

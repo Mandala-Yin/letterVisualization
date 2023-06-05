@@ -1,6 +1,7 @@
 from flask import Flask, render_template, make_response
 import pandas as pd
 import json
+from datetime import datetime
 
 app = Flask(__name__)
 
@@ -33,9 +34,8 @@ def filter():
 
 @app.route('/')
 def index():
-    # response = make_response(render_template('/home.html'))
-    # response.headers['Cache-Control'] = 'no-store, no-cache, must-revalidate, max-age=0'
-    return render_template('/home.html', data = original_data)
+    timestamp = int(datetime.now().timestamp())
+    return render_template('/home.html', data = original_data, timestamp = timestamp)
 
 if __name__ == '__main__':
     app.run()
