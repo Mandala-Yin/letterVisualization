@@ -23,16 +23,15 @@
   display: flex;
   flex-direction: row;
   width: 66.67%;
-  border: 10px solid #ccc;
   padding: 50px;
 }
 
 #title {
-  font-family:xingshu
+  font-family:xingkai
 }
 
 #subtitle {
-  font-family:xingshu
+  font-family:xingkai
 }
 
 @font-face {
@@ -43,4 +42,9 @@
 @font-face {
   font-family: fzq;
   src: url('fonts/FZQINGKBYSJF.TTF')
+}
+
+@font-face {
+  font-family: xingkai;
+  src: url('fonts/腾祥伯当行楷简.ttf')
 }

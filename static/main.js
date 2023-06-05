@@ -93,12 +93,12 @@ let option = {
   //   xAxisIndex: [0],
   //   // yAxisIndex: [0],
   // }],
-  xAxis: {
-    type: 'value'
-  },
-  yAxis: {
-    type: 'value',
-  },
+  // xAxis: {
+  //   type: 'value'
+  // },
+  // yAxis: {
+  //   type: 'value',
+  // },
   series: [{
     name: 'Communication Network',
     roam: true,
@@ -131,3 +131,32 @@ myChart.hideLoading();
 //       shadowColor: 'yellow'
 //     }
 // });
+
+
+function callSearch() {
+  var searchKey = document.getElementById('search_text').value;
+  console.log(searchKey)
+}
+
+// Generate year options dynamically
+var startYearSelect = document.getElementById("start-year");
+var endYearSelect = document.getElementById("end-year");
+var currentYear = new Date().getFullYear();
+
+for (var year = currentYear; year >= 1900; year--) {
+    var yearOption = document.createElement("option");
+    yearOption.value = year;
+    yearOption.text = year;
+    startYearSelect.appendChild(yearOption);
+    endYearSelect.appendChild(yearOption.cloneNode(true));
+}
+
+function filterByYear() {
+    // Add your filtering logic here based on the selected start and end years
+    var startYear = startYearSelect.value;
+    var endYear = endYearSelect.value;
+
+    // Example: log the selected years to the console
+    console.log("Start Year:", startYear);
+    console.log("End Year:", endYear);
+}

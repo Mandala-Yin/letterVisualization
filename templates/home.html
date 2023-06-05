@@ -13,7 +13,6 @@
     <script src="https://cdn.staticfile.org/echarts/5.1.2/echarts.min.js"></script>
 
     <link rel="stylesheet" href="{{ url_for('static', filename='styles.css', v=timestamp) }}">
-    <script src="{{ url_for('static', filename='calculate.js', v=timestamp) }}"></script>
 </head>
 
 <body background="{{url_for('static',filename="images/background.jpeg")}}";
@@ -26,6 +25,15 @@
         <div class="left-container">
             <div class="left">
                 <div>这里是筛选</div>
+                <div>
+                    <label for="start-year">开始年份:</label>
+                    <select id="start-year"></select>
+                </div>
+                <div>
+                    <label for="end-year">结束年份:</label>
+                    <select id="end-year"></select>
+                </div>
+                <button onclick="filterByYear()">筛选</button>
             </div>
             <div class="left">
                 <div>请你利用关键字进行搜索：</div>
