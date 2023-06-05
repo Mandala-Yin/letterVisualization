@@ -26,12 +26,30 @@
             <div class="left">
                 <div>这里是筛选</div>
                 <div>
+                    <label for="relation-filter">通讯关系:</label>
+                    <div class="select-box">
+                        <select id="relation-filter" multiple="true">
+                            <option value="all" onclick="selectAllRelations()">全选</option>
+                            <option value="clear" onclick="clearAllSelections()">清除所有选择</option>
+                            <option value="致书Y">致书Y</option>
+                            <option value="答Y书">答Y书</option>
+                            <option value="向Y致贺">向Y致贺</option>
+                            <option value="致Y啓">致Y啓</option>
+                            <option value="代Y作文">代Y作文</option>
+                        </select>
+                    </div>
+                </div>
+                <div>
                     <label for="start-year">开始年份:</label>
-                    <select id="start-year"></select>
+                    <div class="select-box">
+                        <select id="start-year"></select>
+                    </div>
                 </div>
                 <div>
                     <label for="end-year">结束年份:</label>
-                    <select id="end-year"></select>
+                    <div class="select-box">
+                        <select id="end-year"></select>
+                    </div>
                 </div>
                 <button onclick="filterByYear()">筛选</button>
             </div>

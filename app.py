@@ -1,4 +1,4 @@
-from flask import Flask, render_template, make_response
+from flask import Flask, render_template, make_response, request
 import pandas as pd
 import json
 from datetime import datetime
@@ -31,6 +31,17 @@ def filter():
     filtered_df = pd.DataFrame(filtered_data)
     # filtered_df.to_excel('data/filtered_data.xlsx', index=False)
 
+@app.route('/search', methods=['POST'])
+def search():
+    data = request.get_json()
+    search_key = data.get('searchKey')
+    
+    # 在这里处理传递过来的搜索关键字search_key
+    # 进行相应的搜索操作，可以调用其他函数或者API来处理搜索逻辑
+
+    # 返回响应给前端
+    response_data = {'status': 'success', 'message': 'Search successful'}
+    return jsonify(response_data)
 
 @app.route('/')
 def index():

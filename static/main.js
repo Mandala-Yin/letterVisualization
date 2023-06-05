@@ -133,11 +133,6 @@ myChart.hideLoading();
 // });
 
 
-function callSearch() {
-  var searchKey = document.getElementById('search_text').value;
-  console.log(searchKey)
-}
-
 // Generate year options dynamically
 var startYearSelect = document.getElementById("start-year");
 var endYearSelect = document.getElementById("end-year");
@@ -155,8 +150,71 @@ function filterByYear() {
     // Add your filtering logic here based on the selected start and end years
     var startYear = startYearSelect.value;
     var endYear = endYearSelect.value;
+    var relationFilter = Array.from(document.getElementById("relation-filter").options)
+    .filter(option => option.selected && option.value !== "all" && option.value !== "clear")
+    .map(option => option.value);
 
     // Example: log the selected years to the console
     console.log("Start Year:", startYear);
     console.log("End Year:", endYear);
+    console.log("通讯关系:", relationFilter);
+}
+
+function filter() {
+  var filterBy = {'通讯关系': false, '作者生年': true, '作者卒年': true};
+  var relationFtr = ['致书Y', '答Y书', '向Y致贺', '致Y啓', '代Y作文'];
+  var birthYFtr = {'startY': 1500, 'endY': 1601};  // 含左不含右
+  var deathYFtr = {'startY': 1500, 'endY': 1601};  // 含左不含右
+
+  if (filterBy['通讯关系']) {
+      filtered_data = filtered_data.filter(function(item) {
+          return relationFtr.includes(item['通讯关系']);
+      });
+  }
+  if (filterBy['作者生年']) {
+      filtered_data = filtered_data.filter(function(item) {
+          return !isNaN(item['作者生年']);
+      });
+      filtered_data = filtered_data.filter(function(item) {
+          var birthYear = parseFloat(item['作者生年'].replace('≈', ''));
+          return birthYFtr['startY'] <= birthYear && birthYear < birthYFtr['endY'];
+      });
+  }
+  if (filterBy['作者卒年']) {
+      filtered_data = filtered_data.filter(function(item) {
+          return !isNaN(item['作者卒年']);
+      });
+      filtered_data = filtered_data.filter(function(item) {
+          var deathYear = parseFloat(item['作者卒年'].replace('≈', ''));
+          return deathYFtr['startY'] <= deathYear && deathYear < deathYFtr['endY'];
+      });
+  }
+
+  var filtered_df = new DataFrame(filtered_data);
+  // filtered_df.to_excel('data/filtered_data.xlsx', index=false);
+}
+
+function callSearch() {
+  var searchKey = document.getElementById('search_text').value;
+  console.log(searchKey)
+}
+
+function selectAllRelations() {
+  var relationFilterSelect = document.getElementById("relation-filter");
+  var allOption = relationFilterSelect.querySelector('option[value="all"]');
+  var allSelected = allOption.selected;
+
+  Array.from(relationFilterSelect.options).forEach(function(option) {
+      if (option.value !== "all") {
+          option.selected = allSelected;
+      }
+  });
+}
+
+function clearAllSelections() {
+  var relationFilterSelect = document.getElementById("relation-filter");
+
+  Array.from(relationFilterSelect.options).forEach(function(option) {
+      option.selected = false;
+  });
 }
