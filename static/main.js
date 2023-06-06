@@ -1,10 +1,14 @@
 var authors;
 var receivers;
+var persons;
 var letterCountsByAuthor;
 var letterCountsByReceiver;
+var letterCountsByPerson;
 var letterCount;
+var communicationRelations;
 
 function updateData() {
+
   authors = new Set(filteredData.map(d => d['作者']));
   let nAuthors = authors.size;
 
@@ -27,6 +31,16 @@ function updateData() {
     return counts;
   }, {});
 
+  // 数据预处理
+  persons = new Set([...authors, ...receivers]);
+  letterCountsByReceiver = Array.from(persons).reduce(function (counts, person) {
+    var count = filteredData.filter(function (row) {
+      return row['通讯人'] === person || row['作者'] === person;
+    }).length;
+    counts[person] = person;
+    return counts;
+  }, {});
+
   let nLetter = filteredData.length;
 
   // 获取 data-analysis-content 元素
@@ -37,9 +51,10 @@ function updateData() {
     + "     通讯人数量: " + nReceivers + "<br>"
     + "     信件数量: " + nLetter;
 
+  communicationRelations = filteredData.map(d => [d['通讯关系'], d['作者'], d['通讯人']]);
 }
 
-updateData()
+updateData();
 
 function selectNode(name) {
   selectedNodeInfo.innerHTML = '作者：' + name;
@@ -48,48 +63,6 @@ function selectNode(name) {
   });
   updateSelectedLetters()
 }
-
-var chart = echarts.init(document.getElementById('plot2'));
-
-// 统计每个数出现的次数
-var countMap = new Map();
-Object.values(letterCountsByAuthor).forEach(function (num) {
-  countMap.set(num, (countMap.get(num) || 0) + 1);
-});
-
-// 提取排序后的 x 轴数值和对应的次数
-var entries = Array.from(countMap.entries());
-
-// 对 entries 进行排序
-entries.sort(function (a, b) {
-  return a[0] - b[0];
-});
-
-var xData = entries.map(function (entry) {
-  return entry[0];
-});
-
-var yData = entries.map(function (entry) {
-  return entry[1];
-});
-
-var option2 = {
-  title: {
-    text: 'Letter Counts by Author'
-  },
-  xAxis: {
-    type: 'category',
-    data: xData
-  },
-  yAxis: {
-    type: 'value'
-  },
-  series: [{
-    type: 'bar',
-    data: yData
-  }]
-};
-chart.setOption(option2);
 
 var authorBirthYears = data.map(d => d['作者生年']);
 var authorDeathYears = data.map(d => d['作者卒年']);
@@ -108,8 +81,6 @@ var cssSequenceNumber = data.map(d => d['CSS序号']);
 var cssNumber = data.map(d => d['CSS编号']);
 var remarks = data.map(d => d['备注']);
 
-var communicationRelations = data.map(d => [d['通讯关系'], d['作者'], d['通讯人']]);
-
 
 function updateGraph() {
   // 初始化 echarts 实例
@@ -117,22 +88,9 @@ function updateGraph() {
 
   myChart.showLoading();
 
-  // 数据预处理
-  var uniqueNodesSet = new Set();
-  var uniqueNodes = {};
-
-  filteredData.forEach(function (item) {
-    uniqueNodesSet.add(item.作者);
-    uniqueNodesSet.add(item.通讯人);
-  });
-
-  var uniqueNodesArray = Array.from(uniqueNodesSet);
-  uniqueNodesArray.forEach(function (node, index) {
-    uniqueNodes[node] = index + 1;
-  });
-
   // 构造节点数据
-  var nodes = Object.keys(uniqueNodes).map(function (key) {
+  var nodes = Array.from(persons).map(function (key) {
+    console.log(key)
     var ans = letterCountsByAuthor[key];
     if (!ans) {
       ans = 1;
@@ -151,32 +109,22 @@ function updateGraph() {
     }
 
     return {
-      id: uniqueNodes[key],
+      id: key,
       name: key,
       symbolSize: ans, // 节点的大小
       category: category
     };
   });
 
-  console.log('node', nodes)
-
-  // 构造边数据
-  var links = communicationRelations.slice(0, 500).map(function (rela) {
-    return {
-      source: uniqueNodes[rela[1]] + '',
-      target: uniqueNodes[rela[2]] + ''
-    };
-  });
+  console.log(nodes);
 
   var edges = communicationRelations.map(function (rela) {
     return {
-      source: uniqueNodes[rela[1]] + '',
-      target: uniqueNodes[rela[2]] + '',
+      source: rela[1],
+      target: rela[2],
       value: 10
     };
   });
-
-  console.log('link', links)
 
   let option = {
     tooltip: {},
@@ -232,13 +180,71 @@ function updateGraph() {
   myChart.on('click', function (params) {
     if (params.dataType === 'node') {
       // 将选中节点的信息存储到selectedNode变量中
-      selectAuthor(params.data.name)
+      selectNode(params.data.name);
     }
   });
 
   myChart.hideLoading();
 }
 
+
+function updateBar(type) {
+  var chart = echarts.init(document.getElementById('plot2'));
+
+  // 统计每个数出现的次数
+  var countMap = new Map();
+  if (type === '作者') {
+    Object.values(letterCountsByAuthor).forEach(function (num) {
+      countMap.set(num, (countMap.get(num) || 0) + 1);
+    });
+  } else if (type === '收信者') {
+    Object.values(letterCountsByReceiver).forEach(function (num) {
+      countMap.set(num, (countMap.get(num) || 0) + 1);
+    });
+  } else {
+    Object.values(letterCountsByPerson).forEach(function (num) {
+      countMap.set(num, (countMap.get(num) || 0) + 1);
+    });
+  }
+
+  // 提取排序后的 x 轴数值和对应的次数
+  var entries = Array.from(countMap.entries());
+
+  // 对 entries 进行排序
+  entries.sort(function (a, b) {
+    return a[0] - b[0];
+  });
+
+  var xData = entries.map(function (entry) {
+    return entry[0];
+  });
+
+  var yData = entries.map(function (entry) {
+    return entry[1];
+  });
+
+  var option = {
+    textStyle: {
+      fontFamily: 'fzq', // 设置字体
+      fontSize: 14, // 设置字体大小
+      fontWeight: 'normal', // 设置字体粗细
+      color: 'rgb(81,59,39)' // 设置字体颜色
+    },
+    xAxis: {
+      type: 'category',
+      data: xData
+    },
+    yAxis: {
+      type: 'value'
+    },
+    series: [{
+      type: 'bar',
+      data: yData,
+      color: 'rgb(81,59,39)'
+    }]
+  };
+  chart.setOption(option);
+}
 
 // myChart.dispatchAction({
 //   type: 'highlight',

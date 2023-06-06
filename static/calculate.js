@@ -217,6 +217,7 @@ function filterDataBySelectedItems() {
 
     updateData();
     updateGraph();
+    updateBar("作者");
     return filteredData;
 }
 
@@ -252,5 +253,8 @@ selectAuthor.addEventListener("input", function() {
   selectNode(selectAuthor.value);
 });
 
+
 filterOptions();
+updateData();
 updateGraph();
+updateBar("作者");
