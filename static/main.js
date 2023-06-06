@@ -1,5 +1,14 @@
 // 提取需要的字段
-var authors = data.map(d => d['作者']);
+var authors = new Set(data.map(d => d['作者']));
+
+var letterCountsByAuthor = Array.from(authors).reduce(function(counts, author) {
+  var count = data.filter(function(row) {
+    return row['作者'] === author;
+  }).length;
+  counts[author] = count;
+  return counts;
+}, {});
+
 var authorBirthYears = data.map(d => d['作者生年']);
 var authorDeathYears = data.map(d => d['作者卒年']);
 var titles = data.map(d => d['作品标题']);
@@ -39,14 +48,17 @@ uniqueNodesArray.forEach(function (node, index) {
   uniqueNodes[node] = index + 1;
 });
 
-console.log(uniqueNodes)
-
 // 构造节点数据
 var nodes = Object.keys(uniqueNodes).map(function (key) {
+  var ans = letterCountsByAuthor[key];
+  if (!ans) {
+    ans = 1;
+  }
+  ans = 5 * Math.log(ans + 10)
   return {
     id: uniqueNodes[key],
     name: key,
-    symbolSize: 10, // 节点的大小
+    symbolSize: ans, // 节点的大小
   };
 });
 
@@ -73,12 +85,15 @@ console.log('link', links)
 let option = {
   tooltip: {},
   emphasis: { // 高亮样式
-    focus: 'series', // 设置高亮类型为系列
+    focus: 'adjacency', // 设置高亮类型为系列
     itemStyle: {
       borderWidth: 1, // 边框宽度
       borderColor: 'yellow', // 边框颜色
       shadowBlur: 10, // 阴影模糊度
       shadowColor: 'yellow' // 阴影颜色
+    },
+    lineStyle: {
+      width: 10
     }
   },
   series: [{
@@ -89,6 +104,22 @@ let option = {
     nodes: nodes,
     edges: edges,
   }],
+  scaleLimit: {
+    min: 0.4,
+    max: 2
+  },
+  label: {
+    show: true,
+    position: 'right',
+    formatter: '{b}'
+  },
+  labelLayout: {
+    hideOverlap: true
+  },
+  lineStyle: {
+    color: 'source',
+    curveness: 0.3
+  },
   focusNodeAdjacency: true
 };
 
@@ -185,9 +216,46 @@ function filter() {
   // filtered_df.to_excel('data/filtered_data.xlsx', index=false);
 }
 
+// 获取输入框和下拉列表元素
+var authorInput = document.getElementById('authorInput');
+var selectAuthor = document.getElementById('selectAuthor');
+console.log(selectAuthor)
+
+// 将作者集合中的元素添加为选项
+authors.forEach(function(author) {
+  var option = document.createElement('option');
+  option.value = author;
+  option.text = author;
+  selectAuthor.appendChild(option);
+  console.log(author)
+});
+
+// 过滤选项函数
+function filterOptions() {
+  var searchText = authorInput.value.toLowerCase();
+
+  // 显示符合搜索条件的选项，隐藏其他选项
+  Array.from(selectAuthor.options).forEach(function(option) {
+    var author = option.value.toLowerCase();
+    if (author.includes(searchText)) {
+      option.style.display = 'block';
+    } else {
+      option.style.display = 'none';
+    }
+  });
+}
+
 function callSearch() {
-  var searchKey = document.getElementById('search_text').value;
-  console.log(searchKey)
+  let searchText = document.getElementById('search_text').value.trim(); // 获取搜索词并去除首尾空格
+
+  // 进行搜索
+  let searchResults = Array.from(authors).filter(function(row) {
+    return row.includes(searchText);
+  });
+
+  // 保存选中的结果到 JavaScript 元素
+  let resultElement = document.getElementById('search_results');
+  resultElement.textContent = JSON.stringify(searchResults);
 }
 
 function selectAllRelations() {

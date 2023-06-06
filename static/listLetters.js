@@ -54,4 +54,4 @@ function updatePagination(totalRows) {
 }
 
 // 初始化时更新选中节点信息
-updateSelectedNodeInfo();
+updateSelectedLetters();
