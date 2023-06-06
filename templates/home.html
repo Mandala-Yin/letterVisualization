@@ -20,47 +20,8 @@
         <h1 id="title">明代书信社交网络</h1>
         <h2 id="subtitle">——中国历代人物传记数据库(CBDB)数据可视化</h2>
     </center>
-    <div class="line">
+    <div class="firstline">
         <div class="left-container">
-            <div class="left">
-                <div>这里是筛选</div>
-                <div>
-                    <label for="relation-filter">通讯关系:</label>
-                    <div class="select-box">
-                        <select id="relation-filter" multiple="true">
-                            <option value="all" onclick="selectAllRelations()">全选</option>
-                            <option value="clear" onclick="clearAllSelections()">清除所有选择</option>
-                            <option value="致书Y">致书Y</option>
-                            <option value="答Y书">答Y书</option>
-                            <option value="向Y致贺">向Y致贺</option>
-                            <option value="致Y啓">致Y啓</option>
-                            <option value="代Y作文">代Y作文</option>
-                        </select>
-                    </div>
-                </div>
-                <div class="timeline" id="birthTimeline">
-                    <div class="label-text">作者生年：</div>
-                    <!-- <div class="slider" id="birthStartSlider"></div>
-                    <div class="slider" id="birthEndSlider"></div> -->
-                    <div class="year-label" id="birthStartLabel"></div>
-                    <div class="year-label" id="birthEndLabel"></div>
-                    <div class="year-marker" id="birthStartMarker" style="top: 30px;"></div>
-                    <div class="year-marker" id="birthEndMarker" style="left: 430px; top: 30px;"></div>
-                    <div class="selection" id="birthSelection"></div>
-                </div>
-
-                <div class="timeline" id="deathTimeline">
-                    <div class="label-text">作者卒年：</div>
-                    <!-- <div class="slider" id="deathStartSlider"></div>
-                    <div class="slider" id="deathEndSlider"></div> -->
-                    <div class="year-label" id="deathStartLabel"></div>
-                    <div class="year-label" id="deathEndLabel"></div>
-                    <div class="year-marker" id="deathStartMarker" style="top: 30px;"></div>
-                    <div class="year-marker" id="deathEndMarker" style="left: 430px; top: 30px;"></div>
-                    <div class="selection" id="deathSelection"></div>
-                </div>
-                <button onclick="filterByYear()">筛选</button>
-            </div>
             <div class="left">
                 <div>请你利用关键字进行搜索：</div>
                 <input type="text" name="search_text" id="search_text" placeholder="输入搜索内容">
@@ -74,8 +35,38 @@
                 <div>这里是数据统计</div>
             </div>
         </div>
-        <div id="right-container" class="right">
-            <div id="plot"></div>
+        <div class="right-container">
+            <div id="plot" style="margin-bottom: 50px;"></div>
+            <div class="check-box" style="margin-bottom: 30px;">
+                <label><input type="checkbox" id="select-all" onclick="selectAllRelations()">全选</label>
+                <label><input type="checkbox" id="clear-all" onclick="clearAllSelections()">清除所有选择</label>
+                <label><input type="checkbox" value="致书Y">致书Y</label>
+                <label><input type="checkbox" value="答Y书">答Y书</label>
+                <label><input type="checkbox" value="向Y致贺">向Y致贺</label>
+                <label><input type="checkbox" value="致Y啓">致Y啓</label>
+                <label><input type="checkbox" value="代Y作文">代Y作文</label>
+            </div>
+            <div class="timeline" id="birthTimeline" style="margin-bottom: 30px;">
+                <div class="label-text">作者生年：</div>
+                <!-- <div class="slider" id="birthStartSlider"></div>
+                <div class="slider" id="birthEndSlider"></div> -->
+                <div class="year-label" id="birthStartLabel"></div>
+                <div class="year-label" id="birthEndLabel"></div>
+                <div class="year-marker" id="birthStartMarker" style="left: 100px; top: 30px;"></div>
+                <div class="year-marker" id="birthEndMarker" style="right: 100px; top: 30px;"></div>
+                <div class="selection" id="birthSelection"></div>
+            </div>
+
+            <div class="timeline" id="deathTimeline">
+                <div class="label-text">作者卒年：</div>
+                <!-- <div class="slider" id="deathStartSlider"></div>
+                <div class="slider" id="deathEndSlider"></div> -->
+                <div class="year-label" id="deathStartLabel"></div>
+                <div class="year-label" id="deathEndLabel"></div>
+                <div class="year-marker" id="deathStartMarker" style="left: 100px; top: 30px;"></div>
+                <div class="year-marker" id="deathEndMarker" style="right: 100px; top: 30px;"></div>
+                <div class="selection" id="deathSelection"></div>
+            </div>
         </div>
     </div>
     <div id="selectedNodeInfo"></div>
@@ -92,9 +83,7 @@
         </table>
         <div id="pagination"></div>
     </div>
-    <div id="plot2" class="line"></div>
-
-
+    <div id="plot2" class="firstline"></div>
     <script>
         var data = {{ data | tojson }};
     </script>

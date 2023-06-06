@@ -14,6 +14,7 @@ function createSlider(timelineId, left, year, labelId, markerId, selectionId, sl
     slider.id = sliderId; // 添加滑块的唯一标识符
     slider.addEventListener("drag", handleSliderDrag);
     slider.addEventListener("dragend", handleSliderDragEnd);
+    slider.style.color = 'rgb(81,59,39)';
 
     var yearLabel = document.createElement("div");
     yearLabel.className = "year-label";
@@ -139,12 +140,12 @@ function handleSliderDragEnd(e) {
 }
 
 var birthTimeline = document.getElementById("birthTimeline");
-var birthStartSlider = createSlider("birthTimeline", 0, minBirthYear, "birthStartLabel", "birthSelection", "birthStartSlider");
-var birthEndSlider = createSlider("birthTimeline", birthTimeline.offsetWidth - 10, maxBirthYear, "birthEndLabel", "birthSelection", "birthEndSlider");
+var birthStartSlider = createSlider("birthTimeline", 100, minBirthYear, "birthStartLabel", "birthSelection", "birthStartSlider");
+var birthEndSlider = createSlider("birthTimeline", birthTimeline.offsetWidth - 100, maxBirthYear, "birthEndLabel", "birthSelection", "birthEndSlider");
 
 var deathTimeline = document.getElementById("deathTimeline");
-var deathStartSlider = createSlider("deathTimeline", 0, minDeathYear, "deathStartLabel", "deathSelection", "deathStartSlider");
-var deathEndSlider = createSlider("deathTimeline", deathTimeline.offsetWidth - 10, maxDeathYear, "deathEndLabel", "deathSelection", "deathEndSlider");
+var deathStartSlider = createSlider("deathTimeline", 100, minDeathYear, "deathStartLabel", "deathSelection", "deathStartSlider");
+var deathEndSlider = createSlider("deathTimeline", deathTimeline.offsetWidth - 100, maxDeathYear, "deathEndLabel", "deathSelection", "deathEndSlider");
 
 
 calculateYear(
@@ -176,3 +177,17 @@ calculateYear(
     minDeathYear,
     maxDeathYear
 );
+
+function selectAllRelations() {
+  var checkboxes = document.querySelectorAll('.select-box input[type="checkbox"]');
+  for (var i = 0; i < checkboxes.length; i++) {
+    checkboxes[i].checked = true;
+  }
+}
+
+function clearAllSelections() {
+  var checkboxes = document.querySelectorAll('.select-box input[type="checkbox"]');
+  for (var i = 0; i < checkboxes.length; i++) {
+    checkboxes[i].checked = false;
+  }
+}

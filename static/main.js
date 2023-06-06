@@ -193,7 +193,7 @@ let option = {
     color: 'source',
     curveness: 0.3
   },
-  focusNodeAdjacency: true
+  focusNodeAdjacency: true,
 };
 
 myChart.setOption(option);
@@ -331,22 +331,22 @@ function callSearch() {
   resultElement.textContent = JSON.stringify(searchResults);
 }
 
-function selectAllRelations() {
-  var relationFilterSelect = document.getElementById("relation-filter");
-  var allOption = relationFilterSelect.querySelector('option[value="all"]');
-  var allSelected = allOption.selected;
+// function selectAllRelations() {
+//   var relationFilterSelect = document.getElementById("relation-filter");
+//   var allOption = relationFilterSelect.querySelector('option[value="all"]');
+//   var allSelected = allOption.selected;
 
-  Array.from(relationFilterSelect.options).forEach(function (option) {
-    if (option.value !== "all") {
-      option.selected = allSelected;
-    }
-  });
-}
+//   Array.from(relationFilterSelect.options).forEach(function (option) {
+//     if (option.value !== "all") {
+//       option.selected = allSelected;
+//     }
+//   });
+// }
 
-function clearAllSelections() {
-  var relationFilterSelect = document.getElementById("relation-filter");
+// function clearAllSelections() {
+//   var relationFilterSelect = document.getElementById("relation-filter");
 
-  Array.from(relationFilterSelect.options).forEach(function (option) {
-    option.selected = false;
-  });
-}
+//   Array.from(relationFilterSelect.options).forEach(function (option) {
+//     option.selected = false;
+//   });
+// }

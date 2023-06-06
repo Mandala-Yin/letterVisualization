@@ -1,7 +1,7 @@
-.line {
+.firstline {
   display: flex;
   flex-direction: row;
-  height: 600px;
+  height: 800px;
 }
 
 .left-container {
@@ -19,19 +19,22 @@
   padding: 50px;
 }
 
-#right-container {
+.right-container {
   display: flex;
-  flex-direction: row;
+  flex-direction: column;
   width: 66.67%;
-  padding: 50px;
+  padding: 20px;
 }
 
 #title {
-  font-family:xingkai
+  font-family: xingkai;
+  font-size: 48px;
+  padding: 20px;
 }
 
 #subtitle {
-  font-family:xingkai
+  font-family: xingkai;
+  font-size: 24px;
 }
 
 @font-face {
@@ -102,23 +105,24 @@
 
 .label-text {
   position: absolute;
-  left: -55px; /* 调整为所需的距离 */
+  left: 0px; /* 调整为所需的距离 */
   top: 50%;
   transform: translateY(-50%);
-  font-size: 14px;
-  color: #333;
-  }
+  font-size: 16px;
+  margin-right: 30px;
+  color: rgb(81,59,39);
+}
 
-  .timeline {
-  width: 450px;
+.timeline {
   height: 30px;
-  background-color: #f5f5f5;
   position: relative;
   margin-top: 20px;
   margin-bottom: 20px;
-  }
+  margin-right: 50px;
+  font-family: fzq;
+}
 
-  .slider {
+.slider {
   position: absolute;
   top: 50%;
   transform: translateY(-50%);
@@ -126,30 +130,41 @@
   height: 30px;
   background-color: #333;
   cursor: pointer;
-  }
+}
 
-  .year-label {
+.year-label {
   position: absolute;
   top: 30px;
   width: 100%;
   text-align: center;
-  font-size: 12px;
-  color: #333;
-  }
+  font-size: 16px;
+  color: rgb(81,59,39)
+}
 
-  .year-marker {
+.year-marker {
   position: absolute;
   bottom: -10px;
-  width: 10px;
+  width: 5px;
   text-align: center;
-  font-size: 12px;
-  color: #333;
-  }
+  font-size: 16px;
+  color: rgb(81,59,39)
+}
 
-  .selection {
+.selection {
   position: absolute;
   top: 50%;
   transform: translateY(-50%);
-  height: 30px;
-  background-color: rgb(58, 121, 173);
-  }
+  height: 10px;
+  width: 100%;
+  background-color: rgb(81,59,39);
+}
+
+
+.check-box {
+  display: flex;
+  align-items: center;
+}
+
+.check-box label {
+  margin-right: 10px;
+}
