@@ -1,24 +1,53 @@
-// 提取需要的字段
-var authors = new Set(data.map(d => d['作者']));
+var authors;
+var receivers;
+var letterCountsByAuthor;
+var letterCountsByReceiver;
+var letterCount;
 
-var letterCountsByAuthor = Array.from(authors).reduce(function (counts, author) {
-  var count = data.filter(function (row) {
-    return row['作者'] === author;
-  }).length;
-  counts[author] = count;
-  return counts;
-}, {});
+function updateData() {
+  authors = new Set(filteredData.map(d => d['作者']));
+  let nAuthors = authors.size;
 
-var receivers = new Set(data.map(d => d['通讯人']));
+  letterCountsByAuthor = Array.from(authors).reduce(function (counts, author) {
+    var count = filteredData.filter(function (row) {
+      return row['作者'] === author;
+    }).length;
+    counts[author] = count;
+    return counts;
+  }, {});
 
-var letterCountsByReceiver = Array.from(receivers).reduce(function (counts, receiver) {
-  var count = data.filter(function (row) {
-    return row['通讯人'] === receiver;
-  }).length;
-  counts[receiver] = count;
-  return counts;
-}, {});
+  receivers = new Set(filteredData.map(d => d['通讯人']));
+  let nReceivers = receivers.size;
 
+  letterCountsByReceiver = Array.from(receivers).reduce(function (counts, receiver) {
+    var count = filteredData.filter(function (row) {
+      return row['通讯人'] === receiver;
+    }).length;
+    counts[receiver] = count;
+    return counts;
+  }, {});
+
+  let nLetter = filteredData.length;
+
+  // 获取 data-analysis-content 元素
+  var dataAnalysisContent = document.getElementById("data-analysis-content");
+
+  dataAnalysisContent.innerHTML =
+    "     作者数量: " + nAuthors + "<br>"
+    + "     通讯人数量: " + nReceivers + "<br>"
+    + "     信件数量: " + nLetter;
+
+}
+
+updateData()
+
+function selectNode(name) {
+  selectedNodeInfo.innerHTML = '作者：' + name;
+  selectedRows = filteredData.filter(function (row) {
+    return row['作者'] === name;
+  });
+  updateSelectedLetters()
+}
 
 var chart = echarts.init(document.getElementById('plot2'));
 
@@ -200,19 +229,10 @@ function updateGraph() {
 
   myChart.setOption(option);
 
-  let selectedNodeInfoDiv = document.getElementById('selectedNodeInfo');
-
   myChart.on('click', function (params) {
     if (params.dataType === 'node') {
       // 将选中节点的信息存储到selectedNode变量中
-      selectedNode = params.data;
-      selectedNodeInfo.innerHTML = '作者：' + selectedNode.name;
-      selectedRows = data.filter(function (row) {
-        // return row['作者'] === selectedNode.name;
-        return row['作者'] === selectedNode.name;
-      });
-
-      updateSelectedLetters()
+      selectAuthor(params.data.name)
     }
   });
 
@@ -293,20 +313,6 @@ function filter() {
   // filtered_df.to_excel('data/filtered_data.xlsx', index=false);
 }
 
-// 获取输入框和下拉列表元素
-var authorInput = document.getElementById('authorInput');
-var selectAuthor = document.getElementById('selectAuthor');
-console.log(selectAuthor)
-
-// 将作者集合中的元素添加为选项
-authors.forEach(function (author) {
-  var option = document.createElement('option');
-  option.value = author;
-  option.text = author;
-  selectAuthor.appendChild(option);
-  console.log(author)
-});
-
 // 过滤选项函数
 function filterOptions() {
   var searchText = authorInput.value.toLowerCase();
@@ -334,5 +340,3 @@ function callSearch() {
   let resultElement = document.getElementById('search_results');
   resultElement.textContent = JSON.stringify(searchResults);
 }
-
-updateGraph()

@@ -20,23 +20,34 @@
         <h1 id="title">明代书信社交网络</h1>
         <h2 id="subtitle">——中国历代人物传记数据库(CBDB)数据可视化</h2>
     </center>
-    <div class="firstline">
+    <div class="line">
         <div class="left-container">
-            <div class="left">
-                <div>请你利用关键字进行搜索：</div>
-                <input type="text" name="search_text" id="search_text" placeholder="输入搜索内容">
-                <button onclick="callSearch()">搜索</button>
+            <div id="data-analysis">
+                <div>数据统计：</div>
+                <div id="data-analysis-content"></div>
             </div>
-            <input type="text" id="authorInput" onkeyup="filterOptions()" placeholder="输入关键词">
-            <select id="selectAuthor">
-            </select>
-            <div id="search_results"></div>
-            <div class="left">
-                <div>这里是数据统计</div>
+            <div id="data-select">
+                <div>通过关键词检索一位作者：</div>
+                <input type="text" id="authorInput" placeholder="输入关键词">
+                <select id="selectAuthor">
+                </select>
+            </div>
+            <div id="selectedNodeInfo"></div>
+            <div id="selectedLetters">
+                <table id="selectedLettersTable">
+                    <thead>
+                        <tr>
+                            <th>作品标题</th>
+                            <th>通讯人</th>
+                            <th>通讯关系</th>
+                        </tr>
+                    </thead>
+                    <tbody id="selectedLettersTableBody"></tbody>
+                </table>
+                <div id="pagination"></div>
             </div>
         </div>
         <div class="right-container">
-            <div id="plot" style="margin-bottom: 50px;"></div>
             <div class="check-box" style="margin-bottom: 30px;">
                 <label><input type="checkbox" value="致书Y">致书Y</label>
                 <label><input type="checkbox" value="答Y书">答Y书</label>
@@ -67,23 +78,10 @@
                 <div class="year-marker" id="deathEndMarker" style="right: 100px; top: 30px;"></div>
                 <div class="selection" id="deathSelection"></div>
             </div>
+            <div id="plot" style="margin-top: 50px;"></div>
+            <div id="plot2" style="margin-top: 50px;"></div>
         </div>
     </div>
-    <div id="selectedNodeInfo"></div>
-    <div id="selectedLetters">
-        <table id="selectedLettersTable">
-            <thead>
-                <tr>
-                    <th>作品标题</th>
-                    <th>通讯人</th>
-                    <th>通讯关系</th>
-                </tr>
-            </thead>
-            <tbody id="selectedLettersTableBody"></tbody>
-        </table>
-        <div id="pagination"></div>
-    </div>
-    <div id="plot2" class="firstline"></div>
     <script>
         var data = {{ data | tojson }};
         var filteredData = data;

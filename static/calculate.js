@@ -204,8 +204,6 @@ checkboxes.forEach(function (checkbox) {
 });
 
 checkboxes[checkboxes.length - 1].checked = true;
-selectAllRelations();
-
 
 function filterDataBySelectedItems() {
     var selectedItems = document.querySelectorAll('.check-box input[type="checkbox"]:checked');
@@ -217,7 +215,42 @@ function filterDataBySelectedItems() {
         return selectedValues.includes(row['通讯关系']);
     });
 
-    console.log(filteredData.length)
+    updateData();
     updateGraph();
     return filteredData;
 }
+
+
+selectAllRelations();
+
+
+// 获取 selectAuthor 元素
+var authorInput = document.getElementById("authorInput");
+var selectAuthor = document.getElementById("selectAuthor");
+
+authorInput.oninput = filterOptions;
+// 过滤选项的函数
+function filterOptions() {
+    var keyword = authorInput.value;
+    selectAuthor.innerHTML = "";
+    // 遍历 authors 集合并创建选项
+    authors.forEach(function (author) {
+        if (author.includes(keyword)) {
+            // 创建选项元素
+            var option = document.createElement("option");
+            // 设置选项的值为作者名称
+            option.value = author;
+            // 设置选项的显示文本为作者名称
+            option.text = author;
+            // 将选项添加到 selectAuthor 元素中
+            selectAuthor.appendChild(option);
+        }
+    });
+} 
+
+selectAuthor.addEventListener("input", function() {
+  selectNode(selectAuthor.value);
+});
+
+filterOptions();
+updateGraph();
