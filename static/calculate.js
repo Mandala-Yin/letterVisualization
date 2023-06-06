@@ -5,6 +5,9 @@
 var minBirthYear = 1290, minDeathYear = 1290;
 var maxBirthYear = 1700, maxDeathYear = 1700;
 
+var birthStartYear = minBirthYear, birthEndYear = maxBirthYear;
+var deathStartYear = minDeathYear, deathEndYear = maxDeathYear;
+
 function createSlider(timelineId, left, year, labelId, markerId, selectionId, sliderId) {
     var timeline = document.getElementById(timelineId);
     var slider = document.createElement("div");
@@ -40,6 +43,14 @@ function calculateYear(timelineId, startLabelId, endLabelId, startMarkerId, endM
     // 边界影响
     startYear = startYear + 54
     endYear = endYear + 45
+
+    if (timelineId == "birthTimeline") {
+        birthStartYear = startYear;
+        birthEndYear = endYear;
+    } else if (timelineId == "deathTimeline") {
+        deathStartYear = startYear;
+        deathEndYear = endYear;
+    }
 
     // startYearLabel.innerText = startYear;
     // endYearLabel.innerText = endYear;
@@ -137,6 +148,7 @@ function handleSliderDragEnd(e) {
         minDeathYear,
         maxDeathYear
     );
+    filterData();
 }
 
 var birthTimeline = document.getElementById("birthTimeline");
@@ -196,7 +208,7 @@ checkboxes1.forEach(function (checkbox) {
         if (!this.checked) {
             checkboxes1[checkboxes1.length - 1].checked = false;
         }
-        filterDataBySelectedItems();
+        filterData();
     });
 });
 checkboxes1[checkboxes1.length - 1].checked = true;
@@ -219,23 +231,29 @@ checkboxes2.forEach(function (checkbox) {
 });
 checkboxes2[0].checked = checkboxes2[1].checked = true;
 
-function filterDataBySelectedItems() {
+function filterData() {
     var selectedItems = document.querySelectorAll('#check-box-1 input[type="checkbox"]:checked');
     var selectedValues = Array.from(selectedItems).map(function (item) {
         return item.value;
     });
 
     filteredData = data.filter(function (row) {
-        return selectedValues.includes(row['通讯关系']);
+        var flag = true;
+        flag = flag && selectedValues.includes(row['通讯关系']);
+        if (row['作者生年'] !== '') {
+            flag = flag && row['作者生年'] >= birthStartYear && row['作者生年'] <= birthEndYear;
+        }
+        if (row['作者卒年'] !== '') {
+            flag = flag && row['作者卒年'] >= deathStartYear && row['作者卒年'] <= deathEndYear;
+        }
+        return flag;
     });
 
     updateData();
     updateGraph();
-    updateBar("作者");
+    updateBar("both");
     return filteredData;
 }
-
-
 
 // 获取 selectAuthor 元素
 var authorInput = document.getElementById("authorInput");
