@@ -166,5 +166,37 @@
 }
 
 .check-box label {
-  margin-right: 10px;
+  font-family: fzq;
+  font-size: 16px;
+  margin-left: 20px;
+  color: rgb(81,59,39);
+  padding: auto;
+}
+
+.check-box input[type="checkbox"] {
+  appearance: none;  /* 隐藏原生复选框 */
+  -webkit-appearance: none; /* 兼容性 */
+  -moz-appearance: none; /* 兼容性 */
+  width: 18px;  /* 设置复选框宽度 */
+  height: 18px;  /* 设置复选框高度 */
+  border: 2px solid rgb(81,59,39);  /* 设置边框样式 */
+  border-radius: 4px;  /* 设置边框圆角 */
+  outline: none;  /* 去除选中时的外边框 */
+  margin-right: 6px;  /* 调整复选框与文本之间的间距 */
+  margin-bottom: 5px;
+  vertical-align: middle;  /* 设置复选框垂直居中对齐 */
+}
+
+.check-box input[type="checkbox"]:checked {
+  position: relative;
+}
+
+.check-box input[type="checkbox"]:checked::before {
+  content: "\2713";  /* 使用Unicode编码表示对勾字符 */
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  transform: translate(-50%, -50%);
+  font-size: 16px;
+  color: rgb(81, 59, 39);
 }

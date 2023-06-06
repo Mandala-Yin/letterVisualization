@@ -178,16 +178,46 @@ calculateYear(
     maxDeathYear
 );
 
+
 function selectAllRelations() {
-  var checkboxes = document.querySelectorAll('.select-box input[type="checkbox"]');
-  for (var i = 0; i < checkboxes.length; i++) {
-    checkboxes[i].checked = true;
-  }
+    var selectAllCheckbox = document.getElementById('select-all');
+    if (selectAllCheckbox.checked) {
+        var checkboxes = document.querySelectorAll('.check-box input[type="checkbox"]');
+        for (var i = 0; i < checkboxes.length; i++) {
+            checkboxes[i].checked = true;
+        }
+    }
 }
 
-function clearAllSelections() {
-  var checkboxes = document.querySelectorAll('.select-box input[type="checkbox"]');
-  for (var i = 0; i < checkboxes.length; i++) {
-    checkboxes[i].checked = false;
-  }
+
+// 获取复选框元素
+var checkboxes = document.querySelectorAll('.check-box input[type="checkbox"]');
+
+// 添加事件监听器
+checkboxes.forEach(function (checkbox) {
+    checkbox.addEventListener('change', function () {
+        if (!this.checked) {
+            checkboxes[checkboxes.length - 1].checked = false;
+        }
+        filterDataBySelectedItems();
+    });
+});
+
+checkboxes[checkboxes.length - 1].checked = true;
+selectAllRelations();
+
+
+function filterDataBySelectedItems() {
+    var selectedItems = document.querySelectorAll('.check-box input[type="checkbox"]:checked');
+    var selectedValues = Array.from(selectedItems).map(function (item) {
+        return item.value;
+    });
+
+    filteredData = data.filter(function (row) {
+        return selectedValues.includes(row['通讯关系']);
+    });
+
+    console.log(filteredData.length)
+    updateGraph();
+    return filteredData;
 }

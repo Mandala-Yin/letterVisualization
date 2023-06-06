@@ -1,8 +1,8 @@
 // 提取需要的字段
 var authors = new Set(data.map(d => d['作者']));
 
-var letterCountsByAuthor = Array.from(authors).reduce(function(counts, author) {
-  var count = data.filter(function(row) {
+var letterCountsByAuthor = Array.from(authors).reduce(function (counts, author) {
+  var count = data.filter(function (row) {
     return row['作者'] === author;
   }).length;
   counts[author] = count;
@@ -11,8 +11,8 @@ var letterCountsByAuthor = Array.from(authors).reduce(function(counts, author) {
 
 var receivers = new Set(data.map(d => d['通讯人']));
 
-var letterCountsByReceiver = Array.from(receivers).reduce(function(counts, receiver) {
-  var count = data.filter(function(row) {
+var letterCountsByReceiver = Array.from(receivers).reduce(function (counts, receiver) {
+  var count = data.filter(function (row) {
     return row['通讯人'] === receiver;
   }).length;
   counts[receiver] = count;
@@ -24,7 +24,7 @@ var chart = echarts.init(document.getElementById('plot2'));
 
 // 统计每个数出现的次数
 var countMap = new Map();
-Object.values(letterCountsByAuthor).forEach(function(num) {
+Object.values(letterCountsByAuthor).forEach(function (num) {
   countMap.set(num, (countMap.get(num) || 0) + 1);
 });
 
@@ -32,15 +32,15 @@ Object.values(letterCountsByAuthor).forEach(function(num) {
 var entries = Array.from(countMap.entries());
 
 // 对 entries 进行排序
-entries.sort(function(a, b) {
+entries.sort(function (a, b) {
   return a[0] - b[0];
 });
 
-var xData = entries.map(function(entry) {
+var xData = entries.map(function (entry) {
   return entry[0];
 });
 
-var yData = entries.map(function(entry) {
+var yData = entries.map(function (entry) {
   return entry[1];
 });
 
@@ -81,140 +81,144 @@ var remarks = data.map(d => d['备注']);
 
 var communicationRelations = data.map(d => [d['通讯关系'], d['作者'], d['通讯人']]);
 
-// 初始化 echarts 实例
-var myChart = echarts.init(document.getElementById('plot'));
 
-myChart.showLoading();
+function updateGraph() {
+  // 初始化 echarts 实例
+  var myChart = echarts.init(document.getElementById('plot'));
 
-// 数据预处理
-var uniqueNodesSet = new Set();
-var uniqueNodes = {};
+  myChart.showLoading();
 
-data.forEach(function (item) {
-  uniqueNodesSet.add(item.作者);
-  uniqueNodesSet.add(item.通讯人);
-});
+  // 数据预处理
+  var uniqueNodesSet = new Set();
+  var uniqueNodes = {};
 
-var uniqueNodesArray = Array.from(uniqueNodesSet);
-uniqueNodesArray.forEach(function (node, index) {
-  uniqueNodes[node] = index + 1;
-});
+  filteredData.forEach(function (item) {
+    uniqueNodesSet.add(item.作者);
+    uniqueNodesSet.add(item.通讯人);
+  });
 
-// 构造节点数据
-var nodes = Object.keys(uniqueNodes).map(function (key) {
-  var ans = letterCountsByAuthor[key];
-  if (!ans) {
-    ans = 1;
-  }
-  ans = 5 * Math.log(ans + 10)
-  var category;
-  var inAuthors = authors.has(key);
-  var inReceivers = receivers.has(key);
+  var uniqueNodesArray = Array.from(uniqueNodesSet);
+  uniqueNodesArray.forEach(function (node, index) {
+    uniqueNodes[node] = index + 1;
+  });
 
-  if (inAuthors && inReceivers) {
-    category = 2;
-  } else if (inAuthors) {
-    category = 0;
-  } else {
-    category = 1;
-  }
-  
-  return {
-    id: uniqueNodes[key],
-    name: key,
-    symbolSize: ans, // 节点的大小
-    category: category
-  };
-});
+  // 构造节点数据
+  var nodes = Object.keys(uniqueNodes).map(function (key) {
+    var ans = letterCountsByAuthor[key];
+    if (!ans) {
+      ans = 1;
+    }
+    ans = 5 * Math.log(ans + 10)
+    var category;
+    var inAuthors = authors.has(key);
+    var inReceivers = receivers.has(key);
 
-console.log('node', nodes)
+    if (inAuthors && inReceivers) {
+      category = 2;
+    } else if (inAuthors) {
+      category = 0;
+    } else {
+      category = 1;
+    }
 
-// 构造边数据
-var links = communicationRelations.slice(0, 500).map(function (rela) {
-  return {
-    source: uniqueNodes[rela[1]] + '',
-    target: uniqueNodes[rela[2]] + ''
-  };
-});
+    return {
+      id: uniqueNodes[key],
+      name: key,
+      symbolSize: ans, // 节点的大小
+      category: category
+    };
+  });
 
-var edges = communicationRelations.map(function (rela) {
-  return {
-    source: uniqueNodes[rela[1]] + '',
-    target: uniqueNodes[rela[2]] + '',
-    value: 10
-  };
-});
+  console.log('node', nodes)
 
-console.log('link', links)
+  // 构造边数据
+  var links = communicationRelations.slice(0, 500).map(function (rela) {
+    return {
+      source: uniqueNodes[rela[1]] + '',
+      target: uniqueNodes[rela[2]] + ''
+    };
+  });
 
-let option = {
-  tooltip: {},
-  emphasis: { // 高亮样式
-    focus: 'adjacency', // 设置高亮类型为系列
-    itemStyle: {
-      borderWidth: 1, // 边框宽度
-      borderColor: 'yellow', // 边框颜色
-      shadowBlur: 10, // 阴影模糊度
-      shadowColor: 'yellow' // 阴影颜色
+  var edges = communicationRelations.map(function (rela) {
+    return {
+      source: uniqueNodes[rela[1]] + '',
+      target: uniqueNodes[rela[2]] + '',
+      value: 10
+    };
+  });
+
+  console.log('link', links)
+
+  let option = {
+    tooltip: {},
+    emphasis: { // 高亮样式
+      focus: 'adjacency', // 设置高亮类型为系列
+      itemStyle: {
+        borderWidth: 1, // 边框宽度
+        borderColor: 'yellow', // 边框颜色
+        shadowBlur: 10, // 阴影模糊度
+        shadowColor: 'yellow' // 阴影颜色
+      },
+      lineStyle: {
+        width: 10
+      }
+    },
+    legend: {
+      data: ['作者', '收信人', '作者 & 收信人']
+    },
+    series: [{
+      name: 'Communication Network',
+      roam: true,
+      type: 'graph',
+      layout: 'force',
+      nodes: nodes,
+      edges: edges,
+      categories: [
+        { name: '作者', itemStyle: { color: '#794e50' } },
+        { name: '收信人', itemStyle: { color: '#689095' } },
+        { name: '作者 & 收信人', itemStyle: { color: '#bbc5a5' } },
+      ],
+    }],
+    scaleLimit: {
+      min: 0.4,
+      max: 2
+    },
+    label: {
+      show: true,
+      position: 'right',
+      formatter: '{b}'
+    },
+    labelLayout: {
+      hideOverlap: true
     },
     lineStyle: {
-      width: 10
+      color: 'source',
+      curveness: 0.3
+    },
+    focusNodeAdjacency: true,
+  };
+
+  myChart.setOption(option);
+
+  let selectedNodeInfoDiv = document.getElementById('selectedNodeInfo');
+
+  myChart.on('click', function (params) {
+    if (params.dataType === 'node') {
+      // 将选中节点的信息存储到selectedNode变量中
+      selectedNode = params.data;
+      selectedNodeInfo.innerHTML = '作者：' + selectedNode.name;
+      selectedRows = data.filter(function (row) {
+        // return row['作者'] === selectedNode.name;
+        return row['作者'] === selectedNode.name;
+      });
+
+      updateSelectedLetters()
     }
-  },
-  legend: {
-    data: ['作者', '收信人', '作者 & 收信人']
-  },
-  series: [{
-    name: 'Communication Network',
-    roam: true,
-    type: 'graph',
-    layout: 'force',
-    nodes: nodes,
-    edges: edges,
-    categories: [
-      { name: '作者', itemStyle: { color: '#794e50' }},
-      { name: '收信人', itemStyle: { color: '#689095' }},
-      { name: '作者 & 收信人', itemStyle: { color: '#bbc5a5' }},
-    ],
-  }],
-  scaleLimit: {
-    min: 0.4,
-    max: 2
-  },
-  label: {
-    show: true,
-    position: 'right',
-    formatter: '{b}'
-  },
-  labelLayout: {
-    hideOverlap: true
-  },
-  lineStyle: {
-    color: 'source',
-    curveness: 0.3
-  },
-  focusNodeAdjacency: true,
-};
+  });
 
-myChart.setOption(option);
+  myChart.hideLoading();
+}
 
-let selectedNodeInfoDiv = document.getElementById('selectedNodeInfo');
-
-myChart.on('click', function (params) {
-  if (params.dataType === 'node') {
-    // 将选中节点的信息存储到selectedNode变量中
-    selectedNode = params.data;
-    selectedNodeInfo.innerHTML = '作者：' + selectedNode.name;
-    selectedRows = data.filter(function (row) {
-      // return row['作者'] === selectedNode.name;
-      return row['作者'] === selectedNode.name;
-    });
-    
-    updateSelectedLetters()
-  }
-});
-
-myChart.hideLoading();
 
 // myChart.dispatchAction({
 //   type: 'highlight',
@@ -295,7 +299,7 @@ var selectAuthor = document.getElementById('selectAuthor');
 console.log(selectAuthor)
 
 // 将作者集合中的元素添加为选项
-authors.forEach(function(author) {
+authors.forEach(function (author) {
   var option = document.createElement('option');
   option.value = author;
   option.text = author;
@@ -308,7 +312,7 @@ function filterOptions() {
   var searchText = authorInput.value.toLowerCase();
 
   // 显示符合搜索条件的选项，隐藏其他选项
-  Array.from(selectAuthor.options).forEach(function(option) {
+  Array.from(selectAuthor.options).forEach(function (option) {
     var author = option.value.toLowerCase();
     if (author.includes(searchText)) {
       option.style.display = 'block';
@@ -322,7 +326,7 @@ function callSearch() {
   let searchText = document.getElementById('search_text').value.trim(); // 获取搜索词并去除首尾空格
 
   // 进行搜索
-  let searchResults = Array.from(authors).filter(function(row) {
+  let searchResults = Array.from(authors).filter(function (row) {
     return row.includes(searchText);
   });
 
@@ -331,22 +335,4 @@ function callSearch() {
   resultElement.textContent = JSON.stringify(searchResults);
 }
 
-// function selectAllRelations() {
-//   var relationFilterSelect = document.getElementById("relation-filter");
-//   var allOption = relationFilterSelect.querySelector('option[value="all"]');
-//   var allSelected = allOption.selected;
-
-//   Array.from(relationFilterSelect.options).forEach(function (option) {
-//     if (option.value !== "all") {
-//       option.selected = allSelected;
-//     }
-//   });
-// }
-
-// function clearAllSelections() {
-//   var relationFilterSelect = document.getElementById("relation-filter");
-
-//   Array.from(relationFilterSelect.options).forEach(function (option) {
-//     option.selected = false;
-//   });
-// }
+updateGraph()

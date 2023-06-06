@@ -38,13 +38,13 @@
         <div class="right-container">
             <div id="plot" style="margin-bottom: 50px;"></div>
             <div class="check-box" style="margin-bottom: 30px;">
-                <label><input type="checkbox" id="select-all" onclick="selectAllRelations()">全选</label>
-                <label><input type="checkbox" id="clear-all" onclick="clearAllSelections()">清除所有选择</label>
                 <label><input type="checkbox" value="致书Y">致书Y</label>
                 <label><input type="checkbox" value="答Y书">答Y书</label>
                 <label><input type="checkbox" value="向Y致贺">向Y致贺</label>
                 <label><input type="checkbox" value="致Y啓">致Y啓</label>
                 <label><input type="checkbox" value="代Y作文">代Y作文</label>
+                <label><input type="checkbox" id="select-all" style="margin-left: 100px;"
+                        onclick="selectAllRelations()">全选</label>
             </div>
             <div class="timeline" id="birthTimeline" style="margin-bottom: 30px;">
                 <div class="label-text">作者生年：</div>
@@ -86,6 +86,7 @@
     <div id="plot2" class="firstline"></div>
     <script>
         var data = {{ data | tojson }};
+        var filteredData = data;
     </script>
     <script src="{{ url_for('static', filename='listLetters.js', v=timestamp) }}"></script>
     <script src="{{ url_for('static', filename='main.js', v=timestamp) }}"></script>
