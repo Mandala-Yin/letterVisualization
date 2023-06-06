@@ -9,6 +9,49 @@ var letterCountsByAuthor = Array.from(authors).reduce(function(counts, author) {
   return counts;
 }, {});
 
+
+var chart = echarts.init(document.getElementById('plot2'));
+
+// 统计每个数出现的次数
+var countMap = new Map();
+Object.values(letterCountsByAuthor).forEach(function(num) {
+  countMap.set(num, (countMap.get(num) || 0) + 1);
+});
+
+// 提取排序后的 x 轴数值和对应的次数
+var entries = Array.from(countMap.entries());
+
+// 对 entries 进行排序
+entries.sort(function(a, b) {
+  return a[0] - b[0];
+});
+
+var xData = entries.map(function(entry) {
+  return entry[0];
+});
+
+var yData = entries.map(function(entry) {
+  return entry[1];
+});
+
+var option2 = {
+  title: {
+    text: 'Letter Counts by Author'
+  },
+  xAxis: {
+    type: 'category',
+    data: xData
+  },
+  yAxis: {
+    type: 'value'
+  },
+  series: [{
+    type: 'bar',
+    data: yData
+  }]
+};
+chart.setOption(option2);
+
 var authorBirthYears = data.map(d => d['作者生年']);
 var authorDeathYears = data.map(d => d['作者卒年']);
 var titles = data.map(d => d['作品标题']);
