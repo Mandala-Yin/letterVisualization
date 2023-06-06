@@ -49,4 +49,4 @@ def index():
     return render_template('/home.html', data = original_data, timestamp = timestamp)
 
 if __name__ == '__main__':
-    app.run()
+    app.run(port=45982)

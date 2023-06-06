@@ -5,10 +5,63 @@
 <meta http-equiv="Pragma" content="no-cache" />
 <meta http-equiv="Expires" content="0" />
 
-
 <head>
-
     <title>Ming Letters</title>
+    <style>
+        .label-text {
+            position: absolute;
+            left: -55px; /* 调整为所需的距离 */
+            top: 50%;
+            transform: translateY(-50%);
+            font-size: 14px;
+            color: #333;
+            }
+
+            .timeline {
+            width: 450px;
+            height: 30px;
+            background-color: #f5f5f5;
+            position: relative;
+            margin-top: 20px;
+            margin-bottom: 20px;
+            }
+
+            .slider {
+            position: absolute;
+            top: 50%;
+            transform: translateY(-50%);
+            width: 10px;
+            height: 30px;
+            background-color: #333;
+            cursor: pointer;
+            }
+
+            .year-label {
+            position: absolute;
+            top: 30px;
+            width: 100%;
+            text-align: center;
+            font-size: 12px;
+            color: #333;
+            }
+
+            .year-marker {
+            position: absolute;
+            bottom: -10px;
+            width: 10px;
+            text-align: center;
+            font-size: 12px;
+            color: #333;
+            }
+
+            .selection {
+            position: absolute;
+            top: 50%;
+            transform: translateY(-50%);
+            height: 30px;
+            background-color: blue;
+            }
+    </style>
     <script src="https://cdn.staticfile.org/jquery/3.5.1/jquery.min.js"></script>
     <script src="https://cdn.staticfile.org/echarts/5.1.2/echarts.min.js"></script>
 
@@ -39,17 +92,26 @@
                         </select>
                     </div>
                 </div>
-                <div>
-                    <label for="start-year">开始年份:</label>
-                    <div class="select-box">
-                        <select id="start-year"></select>
-                    </div>
+                <div class="timeline" id="birthTimeline">
+                    <div class="label-text">作者生年：</div>
+                    <!-- <div class="slider" id="birthStartSlider"></div>
+                    <div class="slider" id="birthEndSlider"></div> -->
+                    <div class="year-label" id="birthStartLabel"></div>
+                    <div class="year-label" id="birthEndLabel"></div>
+                    <div class="year-marker" id="birthStartMarker" style="top: 30px;"></div>
+                    <div class="year-marker" id="birthEndMarker" style="left: 430px; top: 30px;"></div>
+                    <div class="selection" id="birthSelection"></div>
                 </div>
-                <div>
-                    <label for="end-year">结束年份:</label>
-                    <div class="select-box">
-                        <select id="end-year"></select>
-                    </div>
+            
+                <div class="timeline" id="deathTimeline">
+                    <div class="label-text">作者卒年：</div>
+                    <!-- <div class="slider" id="deathStartSlider"></div>
+                    <div class="slider" id="deathEndSlider"></div> -->
+                    <div class="year-label" id="deathStartLabel"></div>
+                    <div class="year-label" id="deathEndLabel"></div>
+                    <div class="year-marker" id="deathStartMarker" style="top: 30px;"></div>
+                    <div class="year-marker" id="deathEndMarker" style="left: 430px; top: 30px;"></div>
+                    <div class="selection" id="deathSelection"></div>
                 </div>
                 <button onclick="filterByYear()">筛选</button>
             </div>
@@ -69,6 +131,184 @@
 
     <script>
         var data = {{ data | tojson }};
+        // var minBirthYear = 1299;
+        // var maxBirthYear = 1625;
+        // var minDeathYear = 1368;
+        // var maxDeathYear = 1694;
+        var minBirthYear = 1290, minDeathYear = 1290;
+        var maxBirthYear = 1700, maxDeathYear = 1700;
+        
+        function createSlider(timelineId, left, year, labelId, markerId, selectionId, sliderId) {
+        var timeline = document.getElementById(timelineId);
+        var slider = document.createElement("div");
+        slider.className = "slider";
+        slider.style.left = left + "px";
+        slider.setAttribute("draggable", "true");
+        slider.id = sliderId; // 添加滑块的唯一标识符
+        slider.addEventListener("drag", handleSliderDrag);
+        slider.addEventListener("dragend", handleSliderDragEnd);
+
+        var yearLabel = document.createElement("div");
+        yearLabel.className = "year-label";
+        document.getElementById(labelId).appendChild(yearLabel);
+
+        var yearMarker = document.createElement("div");
+        yearMarker.className = "year-marker";
+        document.getElementById(markerId).appendChild(yearMarker);
+
+        var selection = document.getElementById(selectionId);
+
+        timeline.appendChild(slider);
+
+        return { slider, selection, yearLabel };
+        }
+
+        function calculateYear(timelineId, startLabelId, endLabelId, startMarkerId, endMarkerId, selectionId, startSlider, endSlider, startYearLabel, endYearLabel, minYear, maxYear) {
+        var timeline = document.getElementById(timelineId);
+        var axisRect = timeline.getBoundingClientRect();
+        var startYear = Math.round(((startSlider.offsetLeft - axisRect.left) / (axisRect.width - startSlider.offsetWidth)) * (maxYear - minYear)) + minYear;
+        var endYear = Math.round(((endSlider.offsetLeft - axisRect.left + endSlider.offsetWidth) / (axisRect.width - endSlider.offsetWidth)) * (maxYear - minYear)) + minYear;
+
+        // 边界影响
+        startYear = startYear + 54
+        endYear = endYear + 45
+
+        // startYearLabel.innerText = startYear;
+        // endYearLabel.innerText = endYear;
+
+        var startMarker = document.getElementById(startMarkerId);
+        var endMarker = document.getElementById(endMarkerId);
+        startMarker.innerText = startYear;
+        endMarker.innerText = endYear;
+
+        var selection = document.getElementById(selectionId);
+        selection.style.left = startSlider.offsetLeft + "px";
+        selection.style.width = (endSlider.offsetLeft - startSlider.offsetLeft + endSlider.offsetWidth) + "px";
+        }
+
+        function handleSliderDrag(e) {
+        var slider = e.target;
+        var sliderId = slider.id; // 获取滑块的唯一标识符
+        var axisRect = slider.parentNode.getBoundingClientRect();
+        var minPos = 0;
+        var maxPos = axisRect.width - slider.offsetWidth;
+        var offsetX = e.clientX - axisRect.left;
+        var newPos = offsetX - (slider.offsetWidth / 2);
+
+        if (newPos < minPos) {
+            newPos = minPos;
+        }
+
+        if (newPos > maxPos) {
+            newPos = maxPos;
+        }
+
+        if (e.clientX != 0)
+            slider.style.left = newPos + "px";
+
+        if (sliderId === "birthStartSlider" || sliderId === "birthEndSlider") {
+            calculateYear(
+            "birthTimeline",
+            "birthStartLabel",
+            "birthEndLabel",
+            "birthStartMarker",
+            "birthEndMarker",
+            "birthSelection",
+            birthStartSlider.slider,
+            birthEndSlider.slider,
+            birthStartSlider.yearLabel,
+            birthEndSlider.yearLabel,
+            minBirthYear,
+            maxBirthYear
+            );
+        } else if (sliderId === "deathStartSlider" || sliderId === "deathEndSlider") {
+            calculateYear(
+            "deathTimeline",
+            "deathStartLabel",
+            "deathEndLabel",
+            "deathStartMarker",
+            "deathEndMarker",
+            "deathSelection",
+            deathStartSlider.slider,
+            deathEndSlider.slider,
+            deathStartSlider.yearLabel,
+            deathEndSlider.yearLabel,
+            minDeathYear,
+            maxDeathYear
+            );
+        }
+        }
+
+        function handleSliderDragEnd(e) {
+        calculateYear(
+            "birthTimeline",
+            "birthStartLabel",
+            "birthEndLabel",
+            "birthStartMarker",
+            "birthEndMarker",
+            "birthSelection",
+            birthStartSlider.slider,
+            birthEndSlider.slider,
+            birthStartSlider.yearLabel,
+            birthEndSlider.yearLabel,
+            minBirthYear,
+            maxBirthYear
+        );
+
+        calculateYear(
+            "deathTimeline",
+            "deathStartLabel",
+            "deathEndLabel",
+            "deathStartMarker",
+            "deathEndMarker",
+            "deathSelection",
+            deathStartSlider.slider,
+            deathEndSlider.slider,
+            deathStartSlider.yearLabel,
+            deathEndSlider.yearLabel,
+            minDeathYear,
+            maxDeathYear
+        );
+        }
+
+        var birthTimeline = document.getElementById("birthTimeline");
+        var birthStartSlider = createSlider("birthTimeline", 0, minBirthYear, "birthStartLabel", "birthSelection", "birthStartSlider");
+        var birthEndSlider = createSlider("birthTimeline", birthTimeline.offsetWidth - 10, maxBirthYear, "birthEndLabel", "birthSelection", "birthEndSlider");
+
+        var deathTimeline = document.getElementById("deathTimeline");
+        var deathStartSlider = createSlider("deathTimeline", 0, minDeathYear, "deathStartLabel", "deathSelection", "deathStartSlider");
+        var deathEndSlider = createSlider("deathTimeline", deathTimeline.offsetWidth - 10, maxDeathYear, "deathEndLabel", "deathSelection", "deathEndSlider");
+
+
+        calculateYear(
+        "birthTimeline",
+        "birthStartLabel",
+        "birthEndLabel",
+        "birthStartMarker",
+        "birthEndMarker",
+        "birthSelection",
+        birthStartSlider.slider,
+        birthEndSlider.slider,
+        birthStartSlider.yearLabel,
+        birthEndSlider.yearLabel,
+        minBirthYear,
+        maxBirthYear
+        );
+
+        calculateYear(
+        "deathTimeline",
+        "deathStartLabel",
+        "deathEndLabel",
+        "deathStartMarker",
+        "deathEndMarker",
+        "deathSelection",
+        deathStartSlider.slider,
+        deathEndSlider.slider,
+        deathStartSlider.yearLabel,
+        deathEndSlider.yearLabel,
+        minDeathYear,
+        maxDeathYear
+        );
     </script>
     <script src="{{ url_for('static', filename='main.js', v=timestamp) }}"></script>
 </body>
