@@ -162,7 +162,7 @@ let option = {
     }
   },
   legend: {
-    data: ['Set Authors', 'Set Receivers']
+    data: ['作者', '收信人', '作者 & 收信人']
   },
   series: [{
     name: 'Communication Network',
