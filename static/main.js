@@ -9,6 +9,16 @@ var letterCountsByAuthor = Array.from(authors).reduce(function(counts, author) {
   return counts;
 }, {});
 
+var receivers = new Set(data.map(d => d['通讯人']));
+
+var letterCountsByReceiver = Array.from(receivers).reduce(function(counts, receiver) {
+  var count = data.filter(function(row) {
+    return row['通讯人'] === receiver;
+  }).length;
+  counts[receiver] = count;
+  return counts;
+}, {});
+
 
 var chart = echarts.init(document.getElementById('plot2'));
 
@@ -56,7 +66,6 @@ var authorBirthYears = data.map(d => d['作者生年']);
 var authorDeathYears = data.map(d => d['作者卒年']);
 var titles = data.map(d => d['作品标题']);
 var correspondenceRelationships = data.map(d => d['通讯关系']);
-var correspondents = data.map(d => d['通讯人']);
 var correspondentBirthYears = data.map(d => d['通讯人生年']);
 var correspondentDeathYears = data.map(d => d['通讯人卒年']);
 var correspondenceCounts = data.map(d => d['通讯次数']);
@@ -98,10 +107,23 @@ var nodes = Object.keys(uniqueNodes).map(function (key) {
     ans = 1;
   }
   ans = 5 * Math.log(ans + 10)
+  var category;
+  var inAuthors = authors.has(key);
+  var inReceivers = receivers.has(key);
+
+  if (inAuthors && inReceivers) {
+    category = 2;
+  } else if (inAuthors) {
+    category = 0;
+  } else {
+    category = 1;
+  }
+  
   return {
     id: uniqueNodes[key],
     name: key,
     symbolSize: ans, // 节点的大小
+    category: category
   };
 });
 
@@ -139,6 +161,9 @@ let option = {
       width: 10
     }
   },
+  legend: {
+    data: ['Set Authors', 'Set Receivers']
+  },
   series: [{
     name: 'Communication Network',
     roam: true,
@@ -146,6 +171,11 @@ let option = {
     layout: 'force',
     nodes: nodes,
     edges: edges,
+    categories: [
+      { name: '作者', itemStyle: { color: '#794e50' }},
+      { name: '收信人', itemStyle: { color: '#689095' }},
+      { name: '作者 & 收信人', itemStyle: { color: '#bbc5a5' }},
+    ],
   }],
   scaleLimit: {
     min: 0.4,
