@@ -81,24 +81,6 @@ let option = {
       shadowColor: 'yellow' // 阴影颜色
     }
   },
-  // grid: {  // 创建一个虚拟的坐标轴
-  //   show: true,
-  //   left: '10%',
-  //   right: '10%',
-  //   top: '10%',
-  //   bottom: '10%',
-  // },
-  // dataZoom: [{  // 应用dataZoom到虚拟的坐标轴
-  //   type: 'slider',
-  //   xAxisIndex: [0],
-  //   // yAxisIndex: [0],
-  // }],
-  // xAxis: {
-  //   type: 'value'
-  // },
-  // yAxis: {
-  //   type: 'value',
-  // },
   series: [{
     name: 'Communication Network',
     roam: true,
@@ -106,19 +88,28 @@ let option = {
     layout: 'force',
     nodes: nodes,
     edges: edges,
-    // coordinateSystem: 'cartesian2d',
-    // xAxisIndex: 0, // 对第一个x轴进行缩放
-    // yAxisIndex: 0 // 对第一个y轴进行缩放
   }],
-  // dataZoom: {
-  //   type: 'inside', // 内置型数据区域缩放组件
-  //   xAxisIndex: 0, // 对第一个x轴进行缩放
-  //   yAxisIndex: 0, // 对第一个y轴进行缩放
-  // },
   focusNodeAdjacency: true
 };
 
 myChart.setOption(option);
+
+let selectedNodeInfoDiv = document.getElementById('selectedNodeInfo');
+
+myChart.on('click', function (params) {
+  if (params.dataType === 'node') {
+    // 将选中节点的信息存储到selectedNode变量中
+    selectedNode = params.data;
+    selectedNodeInfo.innerHTML = '作者：' + selectedNode.name;
+    selectedRows = data.filter(function (row) {
+      // return row['作者'] === selectedNode.name;
+      return row['作者'] === selectedNode.name;
+    });
+    
+    updateSelectedLetters()
+  }
+});
+
 myChart.hideLoading();
 
 // myChart.dispatchAction({
@@ -139,55 +130,55 @@ var endYearSelect = document.getElementById("end-year");
 var currentYear = new Date().getFullYear();
 
 for (var year = currentYear; year >= 1900; year--) {
-    var yearOption = document.createElement("option");
-    yearOption.value = year;
-    yearOption.text = year;
-    startYearSelect.appendChild(yearOption);
-    endYearSelect.appendChild(yearOption.cloneNode(true));
+  var yearOption = document.createElement("option");
+  yearOption.value = year;
+  yearOption.text = year;
+  startYearSelect.appendChild(yearOption);
+  endYearSelect.appendChild(yearOption.cloneNode(true));
 }
 
 function filterByYear() {
-    // Add your filtering logic here based on the selected start and end years
-    var startYear = startYearSelect.value;
-    var endYear = endYearSelect.value;
-    var relationFilter = Array.from(document.getElementById("relation-filter").options)
+  // Add your filtering logic here based on the selected start and end years
+  var startYear = startYearSelect.value;
+  var endYear = endYearSelect.value;
+  var relationFilter = Array.from(document.getElementById("relation-filter").options)
     .filter(option => option.selected && option.value !== "all" && option.value !== "clear")
     .map(option => option.value);
 
-    // Example: log the selected years to the console
-    console.log("Start Year:", startYear);
-    console.log("End Year:", endYear);
-    console.log("通讯关系:", relationFilter);
+  // Example: log the selected years to the console
+  console.log("Start Year:", startYear);
+  console.log("End Year:", endYear);
+  console.log("通讯关系:", relationFilter);
 }
 
 function filter() {
-  var filterBy = {'通讯关系': false, '作者生年': true, '作者卒年': true};
+  var filterBy = { '通讯关系': false, '作者生年': true, '作者卒年': true };
   var relationFtr = ['致书Y', '答Y书', '向Y致贺', '致Y啓', '代Y作文'];
-  var birthYFtr = {'startY': 1500, 'endY': 1601};  // 含左不含右
-  var deathYFtr = {'startY': 1500, 'endY': 1601};  // 含左不含右
+  var birthYFtr = { 'startY': 1500, 'endY': 1601 };  // 含左不含右
+  var deathYFtr = { 'startY': 1500, 'endY': 1601 };  // 含左不含右
 
   if (filterBy['通讯关系']) {
-      filtered_data = filtered_data.filter(function(item) {
-          return relationFtr.includes(item['通讯关系']);
-      });
+    filtered_data = filtered_data.filter(function (item) {
+      return relationFtr.includes(item['通讯关系']);
+    });
   }
   if (filterBy['作者生年']) {
-      filtered_data = filtered_data.filter(function(item) {
-          return !isNaN(item['作者生年']);
-      });
-      filtered_data = filtered_data.filter(function(item) {
-          var birthYear = parseFloat(item['作者生年'].replace('≈', ''));
-          return birthYFtr['startY'] <= birthYear && birthYear < birthYFtr['endY'];
-      });
+    filtered_data = filtered_data.filter(function (item) {
+      return !isNaN(item['作者生年']);
+    });
+    filtered_data = filtered_data.filter(function (item) {
+      var birthYear = parseFloat(item['作者生年'].replace('≈', ''));
+      return birthYFtr['startY'] <= birthYear && birthYear < birthYFtr['endY'];
+    });
   }
   if (filterBy['作者卒年']) {
-      filtered_data = filtered_data.filter(function(item) {
-          return !isNaN(item['作者卒年']);
-      });
-      filtered_data = filtered_data.filter(function(item) {
-          var deathYear = parseFloat(item['作者卒年'].replace('≈', ''));
-          return deathYFtr['startY'] <= deathYear && deathYear < deathYFtr['endY'];
-      });
+    filtered_data = filtered_data.filter(function (item) {
+      return !isNaN(item['作者卒年']);
+    });
+    filtered_data = filtered_data.filter(function (item) {
+      var deathYear = parseFloat(item['作者卒年'].replace('≈', ''));
+      return deathYFtr['startY'] <= deathYear && deathYear < deathYFtr['endY'];
+    });
   }
 
   var filtered_df = new DataFrame(filtered_data);
@@ -204,17 +195,17 @@ function selectAllRelations() {
   var allOption = relationFilterSelect.querySelector('option[value="all"]');
   var allSelected = allOption.selected;
 
-  Array.from(relationFilterSelect.options).forEach(function(option) {
-      if (option.value !== "all") {
-          option.selected = allSelected;
-      }
+  Array.from(relationFilterSelect.options).forEach(function (option) {
+    if (option.value !== "all") {
+      option.selected = allSelected;
+    }
   });
 }
 
 function clearAllSelections() {
   var relationFilterSelect = document.getElementById("relation-filter");
 
-  Array.from(relationFilterSelect.options).forEach(function(option) {
-      option.selected = false;
+  Array.from(relationFilterSelect.options).forEach(function (option) {
+    option.selected = false;
   });
 }

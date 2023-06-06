@@ -73,10 +73,26 @@
             <div id="plot"></div>
         </div>
     </div>
+    <div id="selectedNodeInfo"></div>
+    <div id="selectedLetters">
+        <table id="selectedLettersTable">
+            <thead>
+                <tr>
+                    <th>作品标题</th>
+                    <th>通讯人</th>
+                    <th>通讯关系</th>
+                </tr>
+            </thead>
+            <tbody id="selectedLettersTableBody"></tbody>
+        </table>
+        <div id="pagination"></div>
+    </div>
+
 
     <script>
         var data = {{ data | tojson }};
     </script>
+    <script src="{{ url_for('static', filename='listLetters.js', v=timestamp) }}"></script>
     <script src="{{ url_for('static', filename='main.js', v=timestamp) }}"></script>
     <script src="{{ url_for('static', filename='calculate.js', v=timestamp) }}"></script>
 </body>

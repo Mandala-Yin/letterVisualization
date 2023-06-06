@@ -5,7 +5,7 @@ from datetime import datetime
 
 app = Flask(__name__)
 
-data = pd.read_excel('data/letter.xlsx')
+data = pd.read_excel('data/letter_cleared.xlsx')
 original_data = data.to_dict(orient='records')
 filtered_data = original_data
 
