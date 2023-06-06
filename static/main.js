@@ -81,16 +81,15 @@ var cssSequenceNumber = data.map(d => d['CSS序号']);
 var cssNumber = data.map(d => d['CSS编号']);
 var remarks = data.map(d => d['备注']);
 
-
+var myChart;
 function updateGraph() {
   // 初始化 echarts 实例
-  var myChart = echarts.init(document.getElementById('plot'));
+  myChart = echarts.init(document.getElementById('plot'));
 
   myChart.showLoading();
 
   // 构造节点数据
   var nodes = Array.from(persons).map(function (key) {
-    console.log(key)
     var ans = letterCountsByAuthor[key];
     if (!ans) {
       ans = 1;
@@ -115,8 +114,6 @@ function updateGraph() {
       category: category
     };
   });
-
-  console.log(nodes);
 
   var edges = communicationRelations.map(function (rela) {
     return {
@@ -273,17 +270,6 @@ function updateBar(type) {
 
   chart.setOption(option);
 }
-
-// myChart.dispatchAction({
-//   type: 'highlight',
-//   name: '申时行', // 数据点的名称
-//   itemStyle: {
-//       borderWidth: 3,
-//       borderColor: 'yellow',
-//       shadowBlur: 10,
-//       shadowColor: 'yellow'
-//     }
-// });
 
 
 // Generate year options dynamically

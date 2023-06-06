@@ -263,6 +263,16 @@ function filterOptions() {
 
 selectAuthor.addEventListener("input", function() {
   selectNode(selectAuthor.value);
+  myChart.dispatchAction({
+    type: 'highlight',
+    name: selectAuthor.value, // 数据点的名称
+    itemStyle: {
+        borderWidth: 3,
+        borderColor: 'yellow',
+        shadowBlur: 10,
+        shadowColor: 'yellow'
+      }
+  });
 });
 
 selectAllRelations();
