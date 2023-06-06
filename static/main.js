@@ -33,11 +33,11 @@ function updateData() {
 
   // 数据预处理
   persons = new Set([...authors, ...receivers]);
-  letterCountsByReceiver = Array.from(persons).reduce(function (counts, person) {
+  letterCountsByPerson = Array.from(persons).reduce(function (counts, person) {
     var count = filteredData.filter(function (row) {
       return row['通讯人'] === person || row['作者'] === person;
     }).length;
-    counts[person] = person;
+    counts[person] = count;
     return counts;
   }, {});
 
@@ -201,7 +201,7 @@ function updateBar(type) {
     Object.values(letterCountsByReceiver).forEach(function (num) {
       countMap.set(num, (countMap.get(num) || 0) + 1);
     });
-  } else {
+  } else if (type === 'both'){
     Object.values(letterCountsByPerson).forEach(function (num) {
       countMap.set(num, (countMap.get(num) || 0) + 1);
     });
@@ -226,7 +226,7 @@ function updateBar(type) {
   var option = {
     textStyle: {
       fontFamily: 'fzq', // 设置字体
-      fontSize: 14, // 设置字体大小
+      fontSize: 18, // 设置字体大小
       fontWeight: 'normal', // 设置字体粗细
       color: 'rgb(81,59,39)' // 设置字体颜色
     },
@@ -243,6 +243,34 @@ function updateBar(type) {
       color: 'rgb(81,59,39)'
     }]
   };
+
+  if (type === '作者') {
+    option.tooltip = {
+      formatter: function (params) {
+        var xValue = params.name; // x 轴数据项的值
+        var yValue = params.data; // y 轴数据项的值
+        return '寄出' + xValue + '封信的有' + yValue + '人';
+      }
+    }
+  } else if (type === '收信者') {
+    option.tooltip = {
+      formatter: function (params) {
+        var xValue = params.name; // x 轴数据项的值
+        var yValue = params.data; // y 轴数据项的值
+        return '收到' + xValue + '封信的有' + yValue + '人';
+      }
+    }
+  } else if (type === 'both'){
+    option.tooltip = {
+      formatter: function (params) {
+        var xValue = params.name; // x 轴数据项的值
+        var yValue = params.data; // y 轴数据项的值
+        return '通信' + xValue + '封的有' + yValue + '人';
+      }
+    }
+  }
+
+
   chart.setOption(option);
 }
 

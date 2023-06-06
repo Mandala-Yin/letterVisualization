@@ -182,7 +182,7 @@ calculateYear(
 function selectAllRelations() {
     var selectAllCheckbox = document.getElementById('select-all');
     if (selectAllCheckbox.checked) {
-        var checkboxes = document.querySelectorAll('.check-box input[type="checkbox"]');
+        var checkboxes = document.querySelectorAll('#check-box-1 input[type="checkbox"]');
         for (var i = 0; i < checkboxes.length; i++) {
             checkboxes[i].checked = true;
         }
@@ -190,23 +190,37 @@ function selectAllRelations() {
 }
 
 
-// 获取复选框元素
-var checkboxes = document.querySelectorAll('.check-box input[type="checkbox"]');
-
-// 添加事件监听器
-checkboxes.forEach(function (checkbox) {
+var checkboxes1 = document.querySelectorAll('#check-box-1 input[type="checkbox"]');
+checkboxes1.forEach(function (checkbox) {
     checkbox.addEventListener('change', function () {
         if (!this.checked) {
-            checkboxes[checkboxes.length - 1].checked = false;
+            checkboxes1[checkboxes1.length - 1].checked = false;
         }
         filterDataBySelectedItems();
     });
 });
+checkboxes1[checkboxes1.length - 1].checked = true;
 
-checkboxes[checkboxes.length - 1].checked = true;
+// 获取复选框元素
+var checkboxes2 = document.querySelectorAll('#check-box-2 input[type="checkbox"]');
+// 添加事件监听器
+checkboxes2.forEach(function (checkbox) {
+    checkbox.addEventListener('change', function () {
+        if(checkboxes2[0].checked && checkboxes2[1].checked) {
+            updateBar("both");
+        } else if (checkboxes2[0].checked) {
+            updateBar("作者")
+        } else if (checkboxes2[1].checked){
+            updateBar("收信者")
+        } else {
+            updateBar("none")
+        }
+    });
+});
+checkboxes2[0].checked = checkboxes2[1].checked = true;
 
 function filterDataBySelectedItems() {
-    var selectedItems = document.querySelectorAll('.check-box input[type="checkbox"]:checked');
+    var selectedItems = document.querySelectorAll('#check-box-1 input[type="checkbox"]:checked');
     var selectedValues = Array.from(selectedItems).map(function (item) {
         return item.value;
     });
@@ -221,8 +235,6 @@ function filterDataBySelectedItems() {
     return filteredData;
 }
 
-
-selectAllRelations();
 
 
 // 获取 selectAuthor 元素
@@ -253,8 +265,8 @@ selectAuthor.addEventListener("input", function() {
   selectNode(selectAuthor.value);
 });
 
-
+selectAllRelations();
 filterOptions();
 updateData();
 updateGraph();
-updateBar("作者");
+updateBar("both");
