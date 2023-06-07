@@ -218,11 +218,11 @@ var checkboxes2 = document.querySelectorAll('#check-box-2 input[type="checkbox"]
 // 添加事件监听器
 checkboxes2.forEach(function (checkbox) {
     checkbox.addEventListener('change', function () {
-        if(checkboxes2[0].checked && checkboxes2[1].checked) {
+        if (checkboxes2[0].checked && checkboxes2[1].checked) {
             updateBar("both");
         } else if (checkboxes2[0].checked) {
             updateBar("作者")
-        } else if (checkboxes2[1].checked){
+        } else if (checkboxes2[1].checked) {
             updateBar("收信者")
         } else {
             updateBar("none")
@@ -264,7 +264,12 @@ authorInput.oninput = filterOptions;
 function filterOptions() {
     var keyword = authorInput.value;
     selectAuthor.innerHTML = "";
-    // 遍历 authors 集合并创建选项
+
+    var blankOption = document.createElement("option");
+    blankOption.value = "";
+    blankOption.text = "";
+    selectAuthor.appendChild(blankOption);
+
     authors.forEach(function (author) {
         if (author.includes(keyword)) {
             // 创建选项元素
@@ -277,20 +282,22 @@ function filterOptions() {
             selectAuthor.appendChild(option);
         }
     });
-} 
+}
 
-selectAuthor.addEventListener("input", function() {
-  selectNode(selectAuthor.value);
-  myChart.dispatchAction({
-    type: 'highlight',
-    name: selectAuthor.value, // 数据点的名称
-    itemStyle: {
-        borderWidth: 3,
-        borderColor: 'yellow',
-        shadowBlur: 10,
-        shadowColor: 'yellow'
-      }
-  });
+selectAuthor.addEventListener("input", function () {
+    if(selectAuthor.value == "")
+        return;
+    selectNode(selectAuthor.value);
+    myChart.dispatchAction({
+        type: 'highlight',
+        name: selectAuthor.value, // 数据点的名称
+        itemStyle: {
+            borderWidth: 3,
+            borderColor: 'yellow',
+            shadowBlur: 10,
+            shadowColor: 'yellow'
+        }
+    });
 });
 
 selectAllRelations();
