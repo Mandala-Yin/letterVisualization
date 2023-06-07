@@ -13,6 +13,7 @@ function createSlider(timelineId, left, year, labelId, markerId, selectionId, sl
     var slider = document.createElement("div");
     slider.className = "slider";
     slider.style.left = left + "px";
+    console.log(left)
     slider.setAttribute("draggable", "true");
     slider.id = sliderId; // 添加滑块的唯一标识符
     slider.addEventListener("drag", handleSliderDrag);
@@ -37,12 +38,8 @@ function createSlider(timelineId, left, year, labelId, markerId, selectionId, sl
 function calculateYear(timelineId, startLabelId, endLabelId, startMarkerId, endMarkerId, selectionId, startSlider, endSlider, startYearLabel, endYearLabel, minYear, maxYear) {
     var timeline = document.getElementById(timelineId);
     var axisRect = timeline.getBoundingClientRect();
-    var startYear = Math.round(((startSlider.offsetLeft - axisRect.left) / (axisRect.width - startSlider.offsetWidth)) * (maxYear - minYear)) + minYear;
-    var endYear = Math.round(((endSlider.offsetLeft - axisRect.left + endSlider.offsetWidth) / (axisRect.width - endSlider.offsetWidth)) * (maxYear - minYear)) + minYear;
-
-    // 边界影响
-    startYear = startYear + 54
-    endYear = endYear + 45
+    var startYear = Math.round((startSlider.offsetLeft / axisRect.width) * (maxYear - minYear)) + minYear;
+    var endYear = Math.round((endSlider.offsetLeft / axisRect.width) * (maxYear - minYear)) + minYear;
 
     if (timelineId == "birthTimeline") {
         birthStartYear = startYear;
@@ -70,7 +67,7 @@ function handleSliderDrag(e) {
     var sliderId = slider.id; // 获取滑块的唯一标识符
     var axisRect = slider.parentNode.getBoundingClientRect();
     var minPos = 0;
-    var maxPos = axisRect.width - slider.offsetWidth;
+    var maxPos = axisRect.width;
     var offsetX = e.clientX - axisRect.left;
     var newPos = offsetX - (slider.offsetWidth / 2);
 
@@ -152,12 +149,12 @@ function handleSliderDragEnd(e) {
 }
 
 var birthTimeline = document.getElementById("birthTimeline");
-var birthStartSlider = createSlider("birthTimeline", 100, minBirthYear, "birthStartLabel", "birthSelection", "birthStartSlider");
-var birthEndSlider = createSlider("birthTimeline", birthTimeline.offsetWidth - 100, maxBirthYear, "birthEndLabel", "birthSelection", "birthEndSlider");
+var birthStartSlider = createSlider("birthTimeline", 0, minBirthYear, "birthStartLabel", "birthSelection", "birthStartSlider");
+var birthEndSlider = createSlider("birthTimeline", birthTimeline.offsetWidth, maxBirthYear, "birthEndLabel", "birthSelection", "birthEndSlider");
 
 var deathTimeline = document.getElementById("deathTimeline");
-var deathStartSlider = createSlider("deathTimeline", 100, minDeathYear, "deathStartLabel", "deathSelection", "deathStartSlider");
-var deathEndSlider = createSlider("deathTimeline", deathTimeline.offsetWidth - 100, maxDeathYear, "deathEndLabel", "deathSelection", "deathEndSlider");
+var deathStartSlider = createSlider("deathTimeline", 0, minDeathYear, "deathStartLabel", "deathSelection", "deathStartSlider");
+var deathEndSlider = createSlider("deathTimeline", deathTimeline.offsetWidth, maxDeathYear, "deathEndLabel", "deathSelection", "deathEndSlider");
 
 
 calculateYear(

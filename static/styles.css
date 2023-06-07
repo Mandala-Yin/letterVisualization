@@ -116,7 +116,7 @@
 
 .label-text {
   position: absolute;
-  left: 0px; /* 调整为所需的距离 */
+  left: -100px; /* 调整为所需的距离 */
   top: 50%;
   transform: translateY(-50%);
   font-size: 16px;
