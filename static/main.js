@@ -57,29 +57,26 @@ function updateData() {
 updateData();
 
 function selectNode(name) {
-  selectedNodeInfo.innerHTML = '作者：' + name;
+
   selectedRows = filteredData.filter(function (row) {
     return row['作者'] === name;
   });
+  if (selectedRows.length > 0) {
+    if (selectedRows[0]['作者生年'] && selectedRows[0]['作者卒年']) {
+      selectedNodeInfo.innerHTML = '作者：' + name + '（生年：' + selectedRows[0]['作者生年'] + ', 卒年：' + selectedRows[0]['作者卒年'] + ', ';
+    } else {
+      selectedNodeInfo.innerHTML = '作者：' + name + '（';
+    }
+    if (letterCountsByAuthor[name]) {
+      selectedNodeInfo.innerHTML += '共寄信：' + letterCountsByAuthor[name] + '封）';
+    } else {
+      selectedNodeInfo.innerHTML += '共寄信：0 封）';
+    }
+  } else {
+    selectedNodeInfo.innerHTML = '收信者：' + name + '（共收信：' +  letterCountsByReceiver[name] + '封）';
+  }
   updateSelectedLetters()
 }
-
-var authorBirthYears = data.map(d => d['作者生年']);
-var authorDeathYears = data.map(d => d['作者卒年']);
-var titles = data.map(d => d['作品标题']);
-var correspondenceRelationships = data.map(d => d['通讯关系']);
-var correspondentBirthYears = data.map(d => d['通讯人生年']);
-var correspondentDeathYears = data.map(d => d['通讯人卒年']);
-var correspondenceCounts = data.map(d => d['通讯次数']);
-var correspondenceYears = data.map(d => d['通讯年份']);
-var era = data.map(d => d['年号']);
-var year = data.map(d => d['年']);
-var anthology = data.map(d => d['文集']);
-var source = data.map(d => d['出处']);
-var volume = data.map(d => d['卷']);
-var cssSequenceNumber = data.map(d => d['CSS序号']);
-var cssNumber = data.map(d => d['CSS编号']);
-var remarks = data.map(d => d['备注']);
 
 var myChart;
 function updateGraph() {
@@ -92,9 +89,8 @@ function updateGraph() {
   var nodes = Array.from(persons).map(function (key) {
     var ans = letterCountsByAuthor[key];
     if (!ans) {
-      ans = 1;
+      ans = 0;
     }
-    ans = 5 * Math.log(ans + 10)
     var category;
     var inAuthors = authors.has(key);
     var inReceivers = receivers.has(key);
@@ -110,7 +106,8 @@ function updateGraph() {
     return {
       id: key,
       name: key,
-      symbolSize: ans, // 节点的大小
+      value: ans,
+      symbolSize: 5 * Math.log(ans + 10), // 节点的大小
       category: category
     };
   });
@@ -124,24 +121,28 @@ function updateGraph() {
   });
 
   let option = {
-    tooltip: {},
-    emphasis: { // 高亮样式
-      focus: 'adjacency', // 设置高亮类型为系列
+    tooltip: {
+    },
+    emphasis: {
+      focus: 'adjacency',
       itemStyle: {
-        borderWidth: 1, // 边框宽度
-        borderColor: 'yellow', // 边框颜色
-        shadowBlur: 10, // 阴影模糊度
-        shadowColor: 'yellow' // 阴影颜色
+        color: 'yellow',
       },
       lineStyle: {
         width: 10
       }
     },
     legend: {
-      data: ['作者', '收信人', '作者 & 收信人']
+      data: ['作者', '收信人', '作者 & 收信人'],
+      textStyle: {
+        fontFamily: 'fzq', // 设置字体
+        fontSize: 18, // 设置字体大小
+        fontWeight: 'normal', // 设置字体粗细
+        color: 'rgb(81,59,39)' // 设置字体颜色
+      },
     },
     series: [{
-      name: 'Communication Network',
+      name: '通讯关系图',
       roam: true,
       type: 'graph',
       layout: 'force',
@@ -149,10 +150,16 @@ function updateGraph() {
       edges: edges,
       categories: [
         { name: '作者', itemStyle: { color: '#794e50' } },
-        { name: '收信人', itemStyle: { color: '#689095' } },
-        { name: '作者 & 收信人', itemStyle: { color: '#bbc5a5' } },
+        { name: '收信人', itemStyle: { color: '#bbc5a5' } },
+        { name: '作者 & 收信人', itemStyle: { color: '#689095' } },
       ],
     }],
+    textStyle: {
+      fontFamily: 'fzq', // 设置字体
+      fontSize: 18, // 设置字体大小
+      fontWeight: 'normal', // 设置字体粗细
+      color: 'rgb(81,59,39)' // 设置字体颜色
+    },
     scaleLimit: {
       min: 0.4,
       max: 2
@@ -198,7 +205,7 @@ function updateBar(type) {
     Object.values(letterCountsByReceiver).forEach(function (num) {
       countMap.set(num, (countMap.get(num) || 0) + 1);
     });
-  } else if (type === 'both'){
+  } else if (type === 'both') {
     Object.values(letterCountsByPerson).forEach(function (num) {
       countMap.set(num, (countMap.get(num) || 0) + 1);
     });
@@ -249,6 +256,7 @@ function updateBar(type) {
         return '寄出' + xValue + '封信的有' + yValue + '人';
       }
     }
+    option.series[0].color = '#794e50';
   } else if (type === '收信者') {
     option.tooltip = {
       formatter: function (params) {
@@ -257,7 +265,8 @@ function updateBar(type) {
         return '收到' + xValue + '封信的有' + yValue + '人';
       }
     }
-  } else if (type === 'both'){
+    option.series[0].color = '#bbc5a5';
+  } else if (type === 'both') {
     option.tooltip = {
       formatter: function (params) {
         var xValue = params.name; // x 轴数据项的值
@@ -265,6 +274,7 @@ function updateBar(type) {
         return '通信' + xValue + '封的有' + yValue + '人';
       }
     }
+    option.series[0].color = '#689095';
   }
 
 
